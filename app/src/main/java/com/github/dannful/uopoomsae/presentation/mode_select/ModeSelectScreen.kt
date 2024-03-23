@@ -1,11 +1,14 @@
 package com.github.dannful.uopoomsae.presentation.mode_select
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -25,8 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -46,18 +51,17 @@ fun ModeSelectScreen(
     Column(modifier = Modifier.fillMaxSize()) {
         TabRow(
             modifier = Modifier
-                .fillMaxHeight(0.15f)
-                .fillMaxWidth(),
+                .wrapContentSize(),
             selectedTabIndex = selectedTab
         ) {
             Tab(selected = selectedTab == 0, onClick = {
                 selectedTab = 0
-            }) {
+            }, modifier = Modifier.fillMaxWidth().fillMaxHeight(0.15f)) {
                 Text(text = "ENVIAR")
             }
             Tab(selected = selectedTab == 0, onClick = {
                 selectedTab = 1
-            }) {
+            }, modifier = Modifier.fillMaxWidth().fillMaxWidth(0.15f)) {
                 Text(text = "RECEBER")
             }
         }
