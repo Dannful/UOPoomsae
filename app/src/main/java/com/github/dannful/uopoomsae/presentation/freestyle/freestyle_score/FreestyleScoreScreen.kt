@@ -95,7 +95,7 @@ private fun NamedButtonGradient(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = name, style = MaterialTheme.typography.titleMedium)
+            Text(text = name, style = MaterialTheme.typography.titleSmall)
             ButtonGradient(
                 horizontalArrangement = Arrangement.End,
                 boxSize = 45.dp,
