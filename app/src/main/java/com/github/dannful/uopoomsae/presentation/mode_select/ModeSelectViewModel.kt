@@ -22,8 +22,8 @@ class ModeSelectViewModel @Inject constructor(
         private const val TABLE_KEY = "TABLE"
     }
 
-    val judge = savedStateHandle.getStateFlow(JUDGE_KEY, "")
-    val table = savedStateHandle.getStateFlow(TABLE_KEY, "")
+    val judge = savedStateHandle.getStateFlow(JUDGE_KEY, "1")
+    val table = savedStateHandle.getStateFlow(TABLE_KEY, "1")
     val competitionMode = preferencesRepository.getCompetitionMode()
 
     init {
@@ -51,8 +51,10 @@ class ModeSelectViewModel @Inject constructor(
 
     fun submit() {
         viewModelScope.launch {
-            preferencesRepository.saveJudgeId(judge.value.toInt())
-            preferencesRepository.saveTableId(table.value.toInt())
+            val convertedJudge = judge.value.toIntOrNull() ?: return@launch
+            val convertedTable = table.value.toIntOrNull() ?: return@launch
+            preferencesRepository.saveJudgeId(convertedJudge)
+            preferencesRepository.saveTableId(convertedTable)
         }
     }
 }

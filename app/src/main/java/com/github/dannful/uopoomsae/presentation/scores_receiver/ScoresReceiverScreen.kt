@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,11 +30,21 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 fun ScoresReceiverScreen(
     scoresReceiverViewModel: ScoresReceiverViewModel = hiltViewModel()
 ) {
-    PageHeader {
-        val scores by scoresReceiverViewModel.scores.collectAsState()
-        LazyColumn(
+    val scores by scoresReceiverViewModel.scores.collectAsState()
+    PageHeader(bottomBar = {
+        Button(
+            onClick = scoresReceiverViewModel::resetScores,
             modifier = Modifier
-                .weight(5f)
+                .padding(LocalSpacing.current.small)
+                .fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            enabled = scores.any { it.presentationScore != 0f && it.techniqueScore != 0f }
+        ) {
+            Text(text = "ZERAR PLACAR")
+        }
+    }) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
         ) {
             item {
                 Row {
@@ -44,7 +54,7 @@ fun ScoresReceiverScreen(
                 }
             }
             item {
-                Divider()
+                HorizontalDivider()
             }
             items(ScoresReceiverViewModel.JUDGE_COUNT, key = { it }) {
                 val judge = it + 1
@@ -59,17 +69,8 @@ fun ScoresReceiverScreen(
                         color = MaterialTheme.colorScheme.primaryContainer
                     )
                 }
-                Divider()
+                HorizontalDivider()
             }
-        }
-        Button(
-            onClick = scoresReceiverViewModel::resetScores,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text(text = "ZERAR PLACAR")
         }
     }
 }
