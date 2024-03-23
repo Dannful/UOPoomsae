@@ -2,6 +2,7 @@ package com.github.dannful.uopoomsae.presentation.standard.standard_presentation
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -24,6 +25,7 @@ import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
+import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -32,11 +34,25 @@ fun StandardPresentationScreen(
     standardPresentationViewModel: StandardPresentationViewModel = hiltViewModel(),
     onSend: (ScoreBundle) -> Unit
 ) {
-    PageHeader {
+    PageHeader(bottomBar = {
+        val context = LocalContext.current
+        SendButton {
+            standardPresentationViewModel.send()
+            onSend(
+                ScoreBundle(
+                    techniqueScore = standardPresentationViewModel.previousScore
+                        ?: run {
+                            displayRequestFailure(context)
+                            return@SendButton
+                        },
+                    presentationScore = standardPresentationViewModel.calculateScore()
+                )
+            )
+        }
+    }) {
         val speed by standardPresentationViewModel.speed.collectAsState()
         val pace by standardPresentationViewModel.pace.collectAsState()
         val power by standardPresentationViewModel.power.collectAsState()
-        val context = LocalContext.current
         NamedGradient(
             values = StandardPresentationViewModel.values.map { it.toString() },
             name = "VELOCIDADE E POTÊNCIA",
@@ -63,19 +79,6 @@ fun StandardPresentationScreen(
             }
         ) {
             standardPresentationViewModel.setPower(it)
-        }
-        SendButton(modifier = Modifier.weight(0.5f)) {
-            standardPresentationViewModel.send()
-            onSend(
-                ScoreBundle(
-                    techniqueScore = standardPresentationViewModel.previousScore
-                        ?: run {
-                            displayRequestFailure(context)
-                            return@SendButton
-                        },
-                    presentationScore = standardPresentationViewModel.calculateScore()
-                )
-            )
         }
     }
 }

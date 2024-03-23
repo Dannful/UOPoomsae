@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,8 +23,12 @@ import com.github.dannful.uopoomsae.R
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
-fun PageHeader(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
-    Column(modifier = Modifier.fillMaxSize().then(modifier)) {
+fun PageHeader(
+    modifier: Modifier = Modifier,
+    bottomBar: @Composable () -> Unit = {},
+    content: @Composable ColumnScope.() -> Unit
+) {
+    Scaffold(bottomBar = bottomBar, topBar = {
         Surface(tonalElevation = 1.dp, shadowElevation = 1.dp) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
@@ -44,14 +49,22 @@ fun PageHeader(modifier: Modifier = Modifier, content: @Composable ColumnScope.(
                 )
             }
         }
+    }) { contentPadding ->
         Column(
             modifier = Modifier
+                .padding(contentPadding)
                 .fillMaxSize()
-                .padding(LocalSpacing.current.small)
-                .align(Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+                .then(modifier)
         ) {
-            content()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(LocalSpacing.current.small)
+                    .align(Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+            ) {
+                content()
+            }
         }
     }
 }

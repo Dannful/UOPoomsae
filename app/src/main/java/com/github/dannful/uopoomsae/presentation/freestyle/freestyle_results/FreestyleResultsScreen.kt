@@ -22,7 +22,12 @@ fun FreestyleResultsScreen(
     onSelectMode: () -> Unit,
     onFinish: () -> Unit
 ) {
-    PageHeader {
+    PageHeader(bottomBar = {
+        FinishButtonGroup(
+            onSelectMode = onSelectMode,
+            onFinish = onFinish
+        )
+    }) {
         Box(
             modifier = Modifier
                 .weight(5f)
@@ -40,11 +45,6 @@ fun FreestyleResultsScreen(
                 )
             )
         }
-        FinishButtonGroup(
-            onSelectMode = onSelectMode,
-            onFinish = onFinish,
-            modifier = Modifier.weight(1f)
-        )
     }
 }
 

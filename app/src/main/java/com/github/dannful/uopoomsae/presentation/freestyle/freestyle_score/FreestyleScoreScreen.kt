@@ -36,7 +36,18 @@ fun FreestyleScoreScreen(
     freestyleScoreViewModel: FreestyleScoreViewModel = hiltViewModel(),
     onSend: (FreestyleScores) -> Unit
 ) {
-    PageHeader {
+    PageHeader(bottomBar = {
+        SendButton {
+            freestyleScoreViewModel.send()
+            onSend(
+                FreestyleScores(
+                    presentation = freestyleScoreViewModel.calculatePresentation(),
+                    accuracy = freestyleScoreViewModel.calculateTechnique(),
+                    stanceDecrease = freestyleScoreViewModel.calculateStanceDecrease()
+                )
+            )
+        }
+    }) {
         Column(
             modifier = Modifier
                 .weight(6f)
@@ -64,16 +75,6 @@ fun FreestyleScoreScreen(
             CheckGroup(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 freestyleScoreViewModel = freestyleScoreViewModel
-            )
-        }
-        SendButton(modifier = Modifier.weight(1f)) {
-            freestyleScoreViewModel.send()
-            onSend(
-                FreestyleScores(
-                    presentation = freestyleScoreViewModel.calculatePresentation(),
-                    accuracy = freestyleScoreViewModel.calculateTechnique(),
-                    stanceDecrease = freestyleScoreViewModel.calculateStanceDecrease()
-                )
             )
         }
     }

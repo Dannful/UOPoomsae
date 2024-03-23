@@ -1,18 +1,15 @@
 package com.github.dannful.uopoomsae.presentation.mode_select
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -28,15 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Route
+import com.github.dannful.uopoomsae.core.isInt
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
@@ -48,25 +44,25 @@ fun ModeSelectScreen(
     var selectedTab by rememberSaveable {
         mutableIntStateOf(0)
     }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Scaffold(topBar = {
         TabRow(
-            modifier = Modifier
-                .wrapContentSize(),
-            selectedTabIndex = selectedTab
+            selectedTabIndex = selectedTab,
         ) {
             Tab(selected = selectedTab == 0, onClick = {
                 selectedTab = 0
-            }, modifier = Modifier.fillMaxWidth().fillMaxHeight(0.15f)) {
-                Text(text = "ENVIAR")
+            }) {
+                Text(text = "ENVIAR", modifier = Modifier.padding(LocalSpacing.current.medium))
             }
             Tab(selected = selectedTab == 0, onClick = {
                 selectedTab = 1
-            }, modifier = Modifier.fillMaxWidth().fillMaxWidth(0.15f)) {
-                Text(text = "RECEBER")
+            }) {
+                Text(text = "RECEBER", modifier = Modifier.padding(LocalSpacing.current.medium))
             }
         }
+    }) { contentPadding ->
         Box(
             modifier = Modifier
+                .padding(contentPadding)
                 .fillMaxSize(), contentAlignment = Alignment.Center
         ) {
             val competitionMode by modeSelectViewModel.competitionMode.collectAsState(initial = true)
@@ -107,11 +103,13 @@ private fun Send(
         val focusRequester = remember { FocusRequester() }
         val judge by modeSelectViewModel.judge.collectAsState()
         val table by modeSelectViewModel.table.collectAsState()
+        val isError = !judge.isInt() || !table.isInt()
         OutlinedTextField(
             value = judge,
             onValueChange = {
                 modeSelectViewModel.setJudgeId(it.replace("[^0-9]".toRegex(), ""))
             },
+            isError = !judge.isInt(),
             label = {
                 Text(text = "Árbitro")
             },
@@ -128,6 +126,7 @@ private fun Send(
             onValueChange = {
                 modeSelectViewModel.setTableId(it.replace("[^0-9]".toRegex(), ""))
             },
+            isError = !table.isInt(),
             label = {
                 Text(text = "Quadra")
             },
@@ -136,11 +135,12 @@ private fun Send(
                 imeAction = ImeAction.Send
             ),
             keyboardActions = KeyboardActions(onSend = {
+                if (isError) return@KeyboardActions
                 onSend()
             }),
             modifier = Modifier.focusRequester(focusRequester)
         )
-        Button(onClick = onSend) {
+        Button(onClick = onSend, enabled = !isError) {
             Text(text = "ENVIAR")
         }
     }
@@ -161,15 +161,17 @@ fun Receive(
             label = {
                 Text(text = "Quadra")
             },
+            isError = !table.isInt(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Send
             ),
             keyboardActions = KeyboardActions(onSend = {
+                if (!table.isInt()) return@KeyboardActions
                 onSend()
             })
         )
-        Button(onClick = onSend) {
+        Button(onClick = onSend, enabled = table.isInt()) {
             Text(text = "ENVIAR")
         }
     }

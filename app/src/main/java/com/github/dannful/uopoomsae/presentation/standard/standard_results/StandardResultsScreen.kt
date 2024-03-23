@@ -22,10 +22,17 @@ fun StandardResultsScreen(
     onSelectMode: () -> Unit,
     onFinish: () -> Unit
 ) {
-    PageHeader {
-        Box(modifier = Modifier
-            .weight(4f)
-            .fillMaxSize(), contentAlignment = Alignment.Center) {
+    PageHeader(bottomBar = {
+        FinishButtonGroup(
+            onSelectMode = onSelectMode,
+            onFinish = onFinish
+        )
+    }) {
+        Box(
+            modifier = Modifier
+                .weight(4f)
+                .fillMaxSize(), contentAlignment = Alignment.Center
+        ) {
             PerformanceResult(
                 values = mapOf(
                     "PRECISÃO" to standardResultsViewModel.techniqueScore,
@@ -34,11 +41,6 @@ fun StandardResultsScreen(
                 )
             )
         }
-        FinishButtonGroup(
-            onSelectMode = onSelectMode,
-            onFinish = onFinish,
-            modifier = Modifier.weight(1f)
-        )
     }
 }
 

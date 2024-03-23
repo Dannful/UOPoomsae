@@ -8,7 +8,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,7 +29,8 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun CompetitionTypeScreen(
     standardMode: () -> Unit,
-    freestyleMode: () -> Unit
+    freestyleMode: () -> Unit,
+    onBack: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -32,6 +38,9 @@ fun CompetitionTypeScreen(
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.TopStart)) {
+            Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Voltar")
+        }
         Row(
             horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.large),
             verticalAlignment = Alignment.CenterVertically
@@ -66,6 +75,9 @@ fun NavGraphBuilder.competitionTypeRoute(
             },
             freestyleMode = {
                 controller.navigate(Route.FreestyleScore.toString())
+            },
+            onBack = {
+                controller.navigate(Route.ModeSelect.toString())
             }
         )
     }
