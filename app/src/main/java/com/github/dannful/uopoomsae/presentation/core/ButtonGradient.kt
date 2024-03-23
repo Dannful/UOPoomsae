@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.dannful.uopoomsae.core.color.interpolateColor
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
@@ -26,6 +27,8 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun ButtonGradient(
     modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
+    boxSize: Dp = 48.dp,
     initialColor: Color,
     finalColor: Color,
     groupSize: Int = 1,
@@ -35,7 +38,7 @@ fun ButtonGradient(
 ) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
         itemsIndexed(values,
@@ -55,6 +58,7 @@ fun ButtonGradient(
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier
+                    .size(boxSize)
                     .border(
                         shape = RectangleShape,
                         color = MaterialTheme.colorScheme.onBackground,

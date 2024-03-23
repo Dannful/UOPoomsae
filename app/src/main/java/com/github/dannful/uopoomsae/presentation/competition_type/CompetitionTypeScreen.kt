@@ -36,8 +36,15 @@ fun CompetitionTypeScreen(
             horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.large),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(painter = painterResource(id = R.drawable.uopoomsae), contentDescription = null, modifier = Modifier.weight(1f))
-            Column(verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small), modifier = Modifier.weight(1f)) {
+            Image(
+                painter = painterResource(id = R.drawable.uopoomsae),
+                contentDescription = null,
+                modifier = Modifier.weight(1f)
+            )
+            Column(
+                verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+                modifier = Modifier.weight(1f)
+            ) {
                 Button(onClick = standardMode, modifier = Modifier.fillMaxWidth()) {
                     Text(text = "Reconhecido")
                 }
@@ -58,7 +65,7 @@ fun NavGraphBuilder.competitionTypeRoute(
                 controller.navigate(Route.StandardTechnique.toString())
             },
             freestyleMode = {
-
+                controller.navigate(Route.FreestyleScore.toString())
             }
         )
     }

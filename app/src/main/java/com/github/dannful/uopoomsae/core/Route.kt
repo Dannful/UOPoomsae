@@ -25,6 +25,13 @@ sealed class Route(
         )
     )
 
+    object FreestyleScore : Route("freestyleScore")
+    object FreestyleResults : Route("freestyleResults", listOf(
+        RouteArgument("accuracy"),
+        RouteArgument("presentation"),
+        RouteArgument("stanceDecrease")
+    ))
+
     private suspend fun insertArguments(base: String, arguments: Array<out String>): String =
         withContext(Dispatchers.Default) {
             val argumentsIterator = arguments.iterator()

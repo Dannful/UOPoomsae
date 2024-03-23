@@ -27,12 +27,11 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
 fun PerformanceResult(
+    columnsPerRow: Int = 3,
     values: Map<String, Float>
 ) {
     LazyVerticalGrid(
-        modifier = Modifier
-            .fillMaxWidth(),
-        columns = GridCells.Fixed(Constants.COLUMNS_PER_ROW),
+        columns = GridCells.Fixed(columnsPerRow),
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
         verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
     ) {
@@ -51,13 +50,15 @@ fun PerformanceResult(
                     )
                     .padding(LocalSpacing.current.small)
             ) {
+                val isValueCritical = (values[name] ?: 0f) < 0
                 Text(
                     text = name,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .weight(1f),
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleMedium
                 )
                 Divider()
                 Box(
@@ -69,7 +70,9 @@ fun PerformanceResult(
                     Text(
                         text = formatDecimal(values[name] ?: 0f),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.displayLarge
+                        style = MaterialTheme.typography.displayLarge,
+                        color =
+                        if (isValueCritical) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
                     )
                 }
             }

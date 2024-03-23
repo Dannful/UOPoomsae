@@ -8,7 +8,6 @@ object Constants {
     val DEFAULT_FIRST_COLOR = Color(235, 127, 45, 255)
 
     val GRID_CELL_SIZE = 160.dp
-    const val COLUMNS_PER_ROW = 3
 
     const val DATA_STORE_NAME = "settings"
 

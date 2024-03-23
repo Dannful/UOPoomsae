@@ -22,8 +22,8 @@ import com.github.dannful.uopoomsae.R
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
-fun PageHeader(content: @Composable ColumnScope.() -> Unit) {
-    Column(modifier = Modifier.fillMaxSize()) {
+fun PageHeader(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
+    Column(modifier = Modifier.fillMaxSize().then(modifier)) {
         Surface(tonalElevation = 1.dp, shadowElevation = 1.dp) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
