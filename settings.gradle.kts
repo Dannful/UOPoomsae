@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "UOReceiver"
+rootProject.name = "UOPoomsae"
 include(":app")
  
