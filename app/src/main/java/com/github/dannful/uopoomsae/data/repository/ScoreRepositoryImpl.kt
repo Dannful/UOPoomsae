@@ -39,7 +39,7 @@ class ScoreRepositoryImpl(
     override suspend fun sendScore(scoreData: ScoreData): Result<Unit> {
         return try {
             networkClient.webSocket(
-                method = HttpMethod.Post,
+                method = HttpMethod.Get,
                 host = Settings.SERVER_URL,
                 port = Settings.SERVER_PORT,
                 path = Settings.SOCKET_PATH

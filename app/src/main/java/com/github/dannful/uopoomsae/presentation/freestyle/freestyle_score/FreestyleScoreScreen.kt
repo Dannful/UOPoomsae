@@ -161,8 +161,8 @@ fun NavGraphBuilder.freestyleScoreRoute(
         FreestyleScoreScreen {
             scope.launch {
                 val route = Route.FreestyleResults.withArguments(
-                    it.presentation.toString(),
                     it.accuracy.toString(),
+                    it.presentation.toString(),
                     it.stanceDecrease.toString()
                 )
                 controller.navigate(route)

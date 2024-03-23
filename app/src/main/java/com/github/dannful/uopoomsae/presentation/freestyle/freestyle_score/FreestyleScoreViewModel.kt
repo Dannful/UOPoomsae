@@ -26,6 +26,7 @@ class FreestyleScoreViewModel @Inject constructor(
         val values = listOf(
             0f, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f, 0.6f, 0.7f, 0.8f, 0.9f, 1f
         )
+        const val COUNT = 10
 
         const val SCORES_KEY = "scores"
         const val FIRST_STANCE_KEY = "firstStance"
@@ -33,7 +34,7 @@ class FreestyleScoreViewModel @Inject constructor(
         const val THIRD_STANCE_KEY = "thirdStance"
     }
 
-    val scores = savedStateHandle.getStateFlow(SCORES_KEY, List(values.size) { values.lastIndex })
+    val scores = savedStateHandle.getStateFlow(SCORES_KEY, List(10) { values.lastIndex })
     val firstStance = savedStateHandle.getStateFlow(FIRST_STANCE_KEY, false)
     val secondStance = savedStateHandle.getStateFlow(SECOND_STANCE_KEY, false)
     val thirdStance = savedStateHandle.getStateFlow(THIRD_STANCE_KEY, false)
@@ -62,7 +63,7 @@ class FreestyleScoreViewModel @Inject constructor(
     }
 
     fun calculatePresentation(): Float {
-        return (scores.value - (scores.value.take(5)).toSet()).map { values[it] }.sum()
+        return scores.value.map { values[it] }.sum() - calculateTechnique()
     }
 
     fun calculateStanceDecrease(): Float {
@@ -76,11 +77,6 @@ class FreestyleScoreViewModel @Inject constructor(
         return decrease
     }
 
-    fun calculateScore(): Float {
-        val totalScore = scores.value.map { values[it] }.sum()
-        return totalScore - calculateStanceDecrease()
-    }
-
     fun send() {
         viewModelScope.launch {
             val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: true
@@ -92,12 +88,14 @@ class FreestyleScoreViewModel @Inject constructor(
                 if (competitionMode) displayRequestFailure(application)
                 return@launch
             }
+            val presentationScore = calculatePresentation()
+            val accuracyScore = calculateTechnique()
             val result = scoreRepository.sendScore(
                 ScoreData(
                     judgeId = judgeId,
                     tableId = tableId,
-                    presentationScore = calculatePresentation(),
-                    accuracyScore = calculateTechnique()
+                    presentationScore = presentationScore,
+                    accuracyScore = accuracyScore
                 )
             )
             if (result.isFailure && competitionMode) displayRequestFailure(application)

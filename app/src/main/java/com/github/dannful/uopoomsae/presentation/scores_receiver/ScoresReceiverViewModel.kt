@@ -43,7 +43,7 @@ class ScoresReceiverViewModel @Inject constructor(
                 if (competitionMode) displayRequestFailure(application)
             }.collectLatest {
                 setScore(
-                    it.judgeId,
+                    it.judgeId - 1,
                     ScoreBundle(
                         presentationScore = it.presentationScore,
                         techniqueScore = it.accuracyScore
