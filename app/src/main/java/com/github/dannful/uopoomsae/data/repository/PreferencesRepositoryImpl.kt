@@ -1,0 +1,49 @@
+package com.github.dannful.uopoomsae.data.repository
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import com.github.dannful.uopoomsae.core.Constants
+import com.github.dannful.uopoomsae.domain.repository.DispatcherProvider
+import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.withContext
+
+class PreferencesRepositoryImpl(
+    private val dispatcherProvider: DispatcherProvider,
+    private val dataStore: DataStore<Preferences>
+) : PreferencesRepository {
+
+    override suspend fun saveTableId(tableId: Int) {
+        withContext(dispatcherProvider.IO) {
+            dataStore.edit {
+                it[intPreferencesKey(Constants.TABLE_ID_KEY)] = tableId
+            }
+        }
+    }
+
+    override fun getTableId() = dataStore.data.mapNotNull { it[intPreferencesKey(Constants.TABLE_ID_KEY)] }
+
+    override suspend fun setCompetitionMode(competition: Boolean) {
+        withContext(dispatcherProvider.IO) {
+            dataStore.edit {
+                it[booleanPreferencesKey(Constants.COMPETITION_MODE_LABEL)] = competition
+            }
+        }
+    }
+
+    override fun getCompetitionMode() = dataStore.data.map { it[booleanPreferencesKey(Constants.COMPETITION_MODE_LABEL)] ?: true }
+
+    override suspend fun saveJudgeId(judgeId: Int) {
+        withContext(dispatcherProvider.IO) {
+            dataStore.edit {
+                it[intPreferencesKey(Constants.JUDGE_ID_KEY)] = judgeId
+            }
+        }
+    }
+
+    override fun getJudgeId() = dataStore.data.mapNotNull { it[intPreferencesKey(Constants.JUDGE_ID_KEY)] }
+}
