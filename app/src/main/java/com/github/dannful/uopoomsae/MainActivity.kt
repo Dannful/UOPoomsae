@@ -15,6 +15,7 @@ import com.github.dannful.uopoomsae.presentation.competition_type.competitionTyp
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_results.freestyleResultsRoute
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_score.freestyleScoreRoute
 import com.github.dannful.uopoomsae.presentation.mode_select.modeSelectScreen
+import com.github.dannful.uopoomsae.presentation.scores_receiver.scoresReceiverRoute
 import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.standardPresentationScreen
 import com.github.dannful.uopoomsae.presentation.standard.standard_results.standardResultsRoute
 import com.github.dannful.uopoomsae.presentation.standard.standard_technique.standardTechniqueScreen
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
                         standardResultsRoute(controller)
                         freestyleScoreRoute(controller, scope)
                         freestyleResultsRoute(controller)
+                        scoresReceiverRoute()
                     }
                 }
             }

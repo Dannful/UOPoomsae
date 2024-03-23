@@ -37,13 +37,19 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun ModeSelectScreen(
     modeSelectViewModel: ModeSelectViewModel = hiltViewModel(),
-    onSend: () -> Unit
+    onSend: () -> Unit,
+    onReceive: () -> Unit
 ) {
     var selectedTab by rememberSaveable {
         mutableIntStateOf(0)
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        TabRow(modifier = Modifier.fillMaxHeight(0.15f).fillMaxWidth(), selectedTabIndex = selectedTab) {
+        TabRow(
+            modifier = Modifier
+                .fillMaxHeight(0.15f)
+                .fillMaxWidth(),
+            selectedTabIndex = selectedTab
+        ) {
             Tab(selected = selectedTab == 0, onClick = {
                 selectedTab = 0
             }) {
@@ -81,7 +87,7 @@ fun ModeSelectScreen(
 
                 1 -> Receive(modeSelectViewModel) {
                     modeSelectViewModel.submit()
-                    onSend()
+                    onReceive()
                 }
             }
         }
@@ -167,8 +173,9 @@ fun Receive(
 
 fun NavGraphBuilder.modeSelectScreen(navController: NavController) {
     composable(Route.ModeSelect.toString()) {
-        ModeSelectScreen {
-            navController.navigate(Route.CompetitionType.toString())
-        }
+        ModeSelectScreen(
+            onSend = { navController.navigate(Route.CompetitionType.toString()) },
+            onReceive = { navController.navigate(Route.ScoresReceiver.toString()) }
+        )
     }
 }

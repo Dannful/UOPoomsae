@@ -32,6 +32,8 @@ sealed class Route(
         RouteArgument("stanceDecrease")
     ))
 
+    object ScoresReceiver: Route("scoresReceiver")
+
     private suspend fun insertArguments(base: String, arguments: Array<out String>): String =
         withContext(Dispatchers.Default) {
             val argumentsIterator = arguments.iterator()
