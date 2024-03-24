@@ -6,7 +6,6 @@ object Settings {
     const val SERVER_PORT = 80
 
     const val AUTH_REALM = "UOPoomsaeAuth"
-    const val AUTH_NAME = "socketAuth"
     const val AUTH_USERNAME = "fVIDuShuKgVdFVE"
     const val AUTH_PASSWORD = "plXwc6CMV6V9GxJ"
     const val SOCKET_PATH = "/socket"
