@@ -10,6 +10,7 @@ import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,6 +37,7 @@ class ScoresReceiverViewModel @Inject constructor(
     val lastFetch = savedStateHandle.getStateFlow(FETCH_COOLDOWN_KEY, 0)
 
     init {
+        resetScores()
         fetchScores()
     }
 
@@ -51,27 +53,26 @@ class ScoresReceiverViewModel @Inject constructor(
     fun fetchScores() {
         viewModelScope.launch {
             if (lastFetch.value > 0) return@launch
-            val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: true
-            val tableId = preferencesRepository.getTableId().firstOrNull() ?: run {
-                if (competitionMode) displayRequestFailure(application)
-                return@launch
-            }
-            val result = scoreRepository.getScores(tableId)
-            if (result.isFailure && competitionMode) {
-                displayRequestFailure(application)
-                return@launch
-            }
-            result.getOrThrow().forEach { scoreData ->
-                setScore(
-                    scoreData.judgeId - 1,
-                    ScoreBundle(
-                        presentationScore = scoreData.presentationScore,
-                        techniqueScore = scoreData.accuracyScore
+            preferencesRepository.getTableId().collectLatest { tableId ->
+                val competitionMode =
+                    preferencesRepository.getCompetitionMode().firstOrNull() ?: true
+                val result = scoreRepository.getScores(tableId)
+                if (result.isFailure && competitionMode) {
+                    displayRequestFailure(application)
+                    return@collectLatest
+                }
+                result.getOrThrow().forEach { scoreData ->
+                    setScore(
+                        scoreData.judgeId - 1,
+                        ScoreBundle(
+                            presentationScore = scoreData.presentationScore,
+                            techniqueScore = scoreData.accuracyScore
+                        )
                     )
-                )
+                }
+                savedStateHandle[FETCH_COOLDOWN_KEY] = FETCH_COOLDOWN_SECONDS
+                initFetchCountdown()
             }
-            savedStateHandle[FETCH_COOLDOWN_KEY] = FETCH_COOLDOWN_SECONDS
-            initFetchCountdown()
         }
     }
 
