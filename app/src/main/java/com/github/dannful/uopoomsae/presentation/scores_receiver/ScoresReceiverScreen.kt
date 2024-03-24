@@ -1,6 +1,7 @@
 package com.github.dannful.uopoomsae.presentation.scores_receiver
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -32,15 +33,31 @@ fun ScoresReceiverScreen(
 ) {
     val scores by scoresReceiverViewModel.scores.collectAsState()
     PageHeader(bottomBar = {
-        Button(
-            onClick = scoresReceiverViewModel::resetScores,
-            modifier = Modifier
-                .padding(LocalSpacing.current.small)
-                .fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-            enabled = scores.any { it.presentationScore != 0f && it.techniqueScore != 0f }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+            modifier = Modifier.padding(LocalSpacing.current.small)
         ) {
-            Text(text = "ZERAR PLACAR")
+            Button(
+                onClick = scoresReceiverViewModel::resetScores,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                enabled = scores.any { it.presentationScore != 0f && it.techniqueScore != 0f }
+            ) {
+                Text(text = "ZERAR PLACAR")
+            }
+            val fetchCooldown by scoresReceiverViewModel.lastFetch.collectAsState()
+            Button(
+                onClick = scoresReceiverViewModel::fetchScores,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                enabled = fetchCooldown == 0
+            ) {
+                Text(text = "OBTER DADOS${if (fetchCooldown > 0) " ($fetchCooldown)" else ""}")
+            }
         }
     }) {
         LazyColumn(

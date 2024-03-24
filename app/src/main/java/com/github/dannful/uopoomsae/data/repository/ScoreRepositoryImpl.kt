@@ -4,11 +4,19 @@ import com.github.dannful.uopoomsae.core.Settings
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.ScoreRepository
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.websocket.converter
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
+import io.ktor.http.URLBuilder
+import io.ktor.http.URLProtocol
+import io.ktor.http.parametersOf
+import io.ktor.resources.Resource
+import io.ktor.resources.href
 import io.ktor.serialization.deserialize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -17,6 +25,21 @@ import kotlinx.coroutines.flow.flow
 class ScoreRepositoryImpl(
     private val networkClient: HttpClient
 ) : ScoreRepository {
+
+    @Resource(Settings.HTTP_PATH)
+    class Scores {
+
+        @Resource("{tableId}")
+        class TableId(val parent: Scores = Scores(), val tableId: Int) {
+
+            @Resource("{judgeId}")
+            class JudgeId(val parent: TableId, val judgeId: Int)
+        }
+
+        @Resource("new")
+        class New(val parent: Scores = Scores(), val scoreData: ScoreData)
+    }
+
 
     override fun scoresChannel(): Flow<ScoreData> = flow {
         networkClient.webSocket(
@@ -36,7 +59,14 @@ class ScoreRepositoryImpl(
         it.tableId == tableId
     }
 
-    override suspend fun sendScore(scoreData: ScoreData): Result<Unit> {
+    override suspend fun getScores(tableId: Int): Result<List<ScoreData>> = try {
+        val request = networkClient.get(Scores.TableId(tableId = tableId))
+        Result.success(request.body<List<ScoreData>>())
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
+
+    override suspend fun sendScoreSocket(scoreData: ScoreData): Result<Unit> {
         return try {
             networkClient.webSocket(
                 method = HttpMethod.Get,
@@ -50,5 +80,12 @@ class ScoreRepositoryImpl(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    override suspend fun sendScore(scoreData: ScoreData) = try {
+        networkClient.post(Scores.New(scoreData = scoreData))
+        Result.success(Unit)
+    } catch (e: Exception) {
+        Result.failure(e)
     }
 }

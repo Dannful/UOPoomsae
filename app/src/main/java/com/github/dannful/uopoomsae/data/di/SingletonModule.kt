@@ -17,7 +17,10 @@ import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BasicAuthCredentials
 import io.ktor.client.plugins.auth.providers.basic
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.resources.Resources
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.http.URLProtocol
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -33,13 +36,20 @@ class SingletonModule {
         install(ContentNegotiation) {
             json()
         }
+        defaultRequest {
+            host = Settings.SERVER_URL
+            port = Settings.SERVER_PORT
+            url {
+                protocol = URLProtocol.HTTP
+            }
+        }
         install(Auth) {
             basic {
-                realm = Settings.SOCKET_AUTH_REALM
+                realm = Settings.AUTH_REALM
                 credentials {
                     BasicAuthCredentials(
-                        username = Settings.SOCKET_AUTH_USERNAME,
-                        password = Settings.SOCKET_AUTH_PASSWORD
+                        username = Settings.AUTH_USERNAME,
+                        password = Settings.AUTH_PASSWORD
                     )
                 }
             }
@@ -48,6 +58,7 @@ class SingletonModule {
             contentConverter = KotlinxWebsocketSerializationConverter(Json)
             pingInterval = 20_000
         }
+        install(Resources)
     }
 
     @Provides
