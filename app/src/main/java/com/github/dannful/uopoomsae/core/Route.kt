@@ -8,6 +8,7 @@ sealed class Route(
     val arguments: List<RouteArgument> = emptyList()
 ) {
 
+    object Login: Route("login")
     object ModeSelect : Route("modeSelect")
     object CompetitionType : Route("competitionType")
     object StandardTechnique : Route("standardTechnique")

@@ -5,6 +5,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.domain.repository.DispatcherProvider
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
@@ -46,4 +47,24 @@ class PreferencesRepositoryImpl(
     }
 
     override fun getJudgeId() = dataStore.data.mapNotNull { it[intPreferencesKey(Constants.JUDGE_ID_KEY)] }
+
+    override fun getUsername() = dataStore.data.mapNotNull { it[stringPreferencesKey(Constants.USERNAME_KEY)] }
+
+    override suspend fun saveUsername(username: String) {
+        withContext(dispatcherProvider.IO) {
+            dataStore.edit {
+                it[stringPreferencesKey(Constants.USERNAME_KEY)] = username
+            }
+        }
+    }
+
+    override fun getPassword() = dataStore.data.mapNotNull { it[stringPreferencesKey(Constants.PASSWORD_KEY)] }
+
+    override suspend fun savePassword(password: String) {
+        withContext(dispatcherProvider.IO) {
+            dataStore.edit {
+                it[stringPreferencesKey(Constants.PASSWORD_KEY)] = password
+            }
+        }
+    }
 }

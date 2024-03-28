@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -60,7 +61,7 @@ fun PerformanceResult(
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleMedium
                 )
-                Divider()
+                HorizontalDivider()
                 Box(
                     modifier = Modifier
                         .weight(3f)

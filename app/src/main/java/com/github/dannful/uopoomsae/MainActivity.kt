@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -14,6 +15,7 @@ import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.presentation.competition_type.competitionTypeRoute
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_results.freestyleResultsRoute
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_score.freestyleScoreRoute
+import com.github.dannful.uopoomsae.presentation.login_screen.loginRoute
 import com.github.dannful.uopoomsae.presentation.mode_select.modeSelectScreen
 import com.github.dannful.uopoomsae.presentation.scores_receiver.scoresReceiverRoute
 import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.standardPresentationScreen
@@ -21,9 +23,14 @@ import com.github.dannful.uopoomsae.presentation.standard.standard_results.stand
 import com.github.dannful.uopoomsae.presentation.standard.standard_technique.standardTechniqueScreen
 import com.github.dannful.uopoomsae.ui.theme.UOReceiverTheme
 import dagger.hilt.android.AndroidEntryPoint
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.resources.post
+import io.ktor.resources.Resource
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -36,8 +43,9 @@ class MainActivity : ComponentActivity() {
                     val scope = rememberCoroutineScope()
                     NavHost(
                         navController = controller,
-                        startDestination = Route.ModeSelect.toString()
+                        startDestination = Route.Login.toString()
                     ) {
+                        loginRoute(controller)
                         modeSelectScreen(controller)
                         competitionTypeRoute(controller)
                         standardTechniqueScreen(controller, scope)

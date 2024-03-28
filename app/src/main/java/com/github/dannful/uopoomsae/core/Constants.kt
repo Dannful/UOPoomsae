@@ -14,4 +14,6 @@ object Constants {
     const val COMPETITION_MODE_LABEL = "competitionMode"
     const val TABLE_ID_KEY = "tableId"
     const val JUDGE_ID_KEY = "judgeId"
+    const val USERNAME_KEY = "username"
+    const val PASSWORD_KEY = "password"
 }

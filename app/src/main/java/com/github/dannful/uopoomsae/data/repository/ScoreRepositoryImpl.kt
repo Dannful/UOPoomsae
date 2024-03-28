@@ -13,11 +13,13 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.resources.Resource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 
 class ScoreRepositoryImpl(
-    private val networkClient: HttpClient
+    private val networkClient: Flow<HttpClient>
 ) : ScoreRepository {
 
     @Resource(Settings.HTTP_PATH)
@@ -36,15 +38,17 @@ class ScoreRepositoryImpl(
 
 
     override fun scoresChannel(): Flow<ScoreData> = flow {
-        networkClient.webSocket(
-            method = HttpMethod.Get,
-            host = Settings.SERVER_URL,
-            port = Settings.SERVER_PORT,
-            path = Settings.SOCKET_PATH
-        ) {
-            while (true) {
-                val incoming = receiveDeserialized<ScoreData>()
-                emit(incoming)
+        networkClient.collectLatest { client ->
+            client.webSocket(
+                method = HttpMethod.Get,
+                host = Settings.SERVER_URL,
+                port = Settings.SERVER_PORT,
+                path = Settings.SOCKET_PATH
+            ) {
+                while (true) {
+                    val incoming = receiveDeserialized<ScoreData>()
+                    emit(incoming)
+                }
             }
         }
     }
@@ -54,7 +58,7 @@ class ScoreRepositoryImpl(
     }
 
     override suspend fun getScores(tableId: Int): Result<List<ScoreData>> = try {
-        val request = networkClient.get(Scores.TableId(tableId = tableId))
+        val request = networkClient.first().get(Scores.TableId(tableId = tableId))
         Result.success(request.body<List<ScoreData>>())
     } catch (e: Exception) {
         Result.failure(e)
@@ -62,7 +66,7 @@ class ScoreRepositoryImpl(
 
     override suspend fun sendScoreSocket(scoreData: ScoreData): Result<Unit> {
         return try {
-            networkClient.webSocket(
+            networkClient.first().webSocket(
                 method = HttpMethod.Get,
                 host = Settings.SERVER_URL,
                 port = Settings.SERVER_PORT,
@@ -77,7 +81,7 @@ class ScoreRepositoryImpl(
     }
 
     override suspend fun sendScore(scoreData: ScoreData) = try {
-        networkClient.post(Scores.New(scoreData = scoreData))
+        networkClient.first().post(Scores.New(scoreData = scoreData))
         Result.success(Unit)
     } catch (e: Exception) {
         Result.failure(e)
