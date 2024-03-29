@@ -15,9 +15,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -27,9 +30,10 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
 fun CompetitionTypeScreen(
+    competitionTypeViewModel: CompetitionTypeViewModel = hiltViewModel(),
     standardMode: () -> Unit,
     freestyleMode: () -> Unit,
-    onBack: () -> Unit
+    onBack: (Route) -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -37,7 +41,11 @@ fun CompetitionTypeScreen(
             .fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        IconButton(onClick = onBack, modifier = Modifier.align(Alignment.TopStart)) {
+        IconButton(onClick = {
+            competitionTypeViewModel.onUserAuth {
+                onBack(if (it) Route.ModeSelect else Route.Login)
+            }
+        }, modifier = Modifier.align(Alignment.TopStart)) {
             Icon(imageVector = Icons.AutoMirrored.Default.ArrowBack, contentDescription = "Voltar")
         }
         Row(
@@ -76,7 +84,7 @@ fun NavGraphBuilder.competitionTypeRoute(
                 controller.navigate(Route.FreestyleScore.toString())
             },
             onBack = {
-                controller.navigate(Route.ModeSelect.toString())
+                controller.navigate(it.toString())
             }
         )
     }

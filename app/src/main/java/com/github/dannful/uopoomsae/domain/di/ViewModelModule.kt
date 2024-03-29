@@ -1,19 +1,23 @@
 package com.github.dannful.uopoomsae.domain.di
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.github.dannful.uopoomsae.core.Settings
 import com.github.dannful.uopoomsae.data.repository.PreferencesRepositoryImpl
-import com.github.dannful.uopoomsae.data.repository.ScoreRepositoryImpl
+import com.github.dannful.uopoomsae.data.repository.RemoteRepositoryImpl
 import com.github.dannful.uopoomsae.domain.repository.DispatcherProvider
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
-import com.github.dannful.uopoomsae.domain.repository.ScoreRepository
+import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.BasicAuthCredentials
 import io.ktor.client.plugins.auth.providers.basic
@@ -26,8 +30,11 @@ import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 
 @Module
@@ -45,7 +52,7 @@ class ViewModelModule {
     @ViewModelScoped
     fun provideScoreRepository(
         clients: Flow<HttpClient>
-    ): ScoreRepository = ScoreRepositoryImpl(clients)
+    ): RemoteRepository = RemoteRepositoryImpl(clients)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Provides
@@ -59,14 +66,15 @@ class ViewModelModule {
                     json()
                 }
                 defaultRequest {
-                    host = Settings.SERVER_URL
-                    port = Settings.SERVER_PORT
                     url {
+                        host = Settings.SERVER_URL
+                        port = Settings.SERVER_PORT
                         protocol = URLProtocol.HTTP
                     }
                 }
                 install(Auth) {
                     basic {
+                        sendWithoutRequest { true }
                         realm = Settings.AUTH_REALM
                         credentials {
                             BasicAuthCredentials(

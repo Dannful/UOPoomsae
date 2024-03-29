@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
-import com.github.dannful.uopoomsae.domain.repository.ScoreRepository
+import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StandardPresentationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val scoreRepository: ScoreRepository,
+    private val remoteRepository: RemoteRepository,
     private val preferencesRepository: PreferencesRepository,
     private val application: Application
 ) : ViewModel() {
@@ -73,23 +73,24 @@ class StandardPresentationViewModel @Inject constructor(
     fun send() {
         viewModelScope.launch {
             val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: true
+            if (!competitionMode) return@launch
             val tableId = preferencesRepository.getTableId().firstOrNull() ?: run {
-                if (competitionMode) displayRequestFailure(application)
+                displayRequestFailure(application)
                 return@launch
             }
             val judgeId = preferencesRepository.getJudgeId().firstOrNull() ?: run {
-                if (competitionMode) displayRequestFailure(application)
+                displayRequestFailure(application)
                 return@launch
             }
-            val result = scoreRepository.sendScore(
+            val result = remoteRepository.sendScore(
                 ScoreData(
-                    tableId = tableId,
-                    judgeId = judgeId,
+                    tableId = tableId.toShort(),
+                    judgeId = judgeId.toShort(),
                     accuracyScore = previousScore ?: return@launch,
                     presentationScore = calculateScore()
                 )
             )
-            if (result.isFailure && competitionMode)
+            if (result.isFailure)
                 displayRequestFailure(application)
         }
     }

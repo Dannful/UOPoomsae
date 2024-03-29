@@ -44,19 +44,23 @@ fun ModeSelectScreen(
     var selectedTab by rememberSaveable {
         mutableIntStateOf(0)
     }
+    val isUserAdmin by modeSelectViewModel.isUserAdmin.collectAsState(initial = false)
+    val competitionMode by modeSelectViewModel.competitionMode.collectAsState(initial = true)
     Scaffold(topBar = {
-        TabRow(
-            selectedTabIndex = selectedTab,
-        ) {
-            Tab(selected = selectedTab == 0, onClick = {
-                selectedTab = 0
-            }) {
-                Text(text = "ENVIAR", modifier = Modifier.padding(LocalSpacing.current.medium))
-            }
-            Tab(selected = selectedTab == 0, onClick = {
-                selectedTab = 1
-            }) {
-                Text(text = "RECEBER", modifier = Modifier.padding(LocalSpacing.current.medium))
+        if (isUserAdmin) {
+            TabRow(
+                selectedTabIndex = selectedTab,
+            ) {
+                Tab(selected = selectedTab == 0, onClick = {
+                    selectedTab = 0
+                }) {
+                    Text(text = "ENVIAR", modifier = Modifier.padding(LocalSpacing.current.medium))
+                }
+                Tab(selected = selectedTab == 0, onClick = {
+                    selectedTab = 1
+                }) {
+                    Text(text = "RECEBER", modifier = Modifier.padding(LocalSpacing.current.medium))
+                }
             }
         }
     }) { contentPadding ->
@@ -65,7 +69,6 @@ fun ModeSelectScreen(
                 .padding(contentPadding)
                 .fillMaxSize(), contentAlignment = Alignment.Center
         ) {
-            val competitionMode by modeSelectViewModel.competitionMode.collectAsState(initial = true)
             Column(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -79,13 +82,27 @@ fun ModeSelectScreen(
                 })
                 Text(text = if (competitionMode) "Competição" else "Treino")
             }
+            val judge by modeSelectViewModel.judge.collectAsState()
+            val table by modeSelectViewModel.table.collectAsState()
             when (selectedTab) {
-                0 -> Send(modeSelectViewModel) {
+                0 -> Send(
+                    updateJudge = {
+                        modeSelectViewModel.setJudgeId(it)
+                    },
+                    updateTable = {
+                        modeSelectViewModel.setTableId(it)
+                    },
+                    competitionMode = competitionMode,
+                    judge = judge,
+                    table = table
+                ) {
                     modeSelectViewModel.submit()
                     onSend()
                 }
 
-                1 -> Receive(modeSelectViewModel) {
+                1 -> Receive(updateTable = {
+                    modeSelectViewModel.setTableId(it)
+                }, table = table, competitionMode = competitionMode) {
                     modeSelectViewModel.submit()
                     onReceive()
                 }
@@ -96,19 +113,19 @@ fun ModeSelectScreen(
 
 @Composable
 private fun Send(
-    modeSelectViewModel: ModeSelectViewModel,
+    updateJudge: (String) -> Unit,
+    updateTable: (String) -> Unit,
+    judge: String,
+    table: String,
+    competitionMode: Boolean,
     onSend: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         val focusRequester = remember { FocusRequester() }
-        val judge by modeSelectViewModel.judge.collectAsState()
-        val table by modeSelectViewModel.table.collectAsState()
         val isError = !judge.isInt() || !table.isInt()
         OutlinedTextField(
             value = judge,
-            onValueChange = {
-                modeSelectViewModel.setJudgeId(it.replace("[^0-9]".toRegex(), ""))
-            },
+            onValueChange = updateJudge,
             isError = !judge.isInt(),
             label = {
                 Text(text = "Árbitro")
@@ -119,13 +136,11 @@ private fun Send(
             ),
             keyboardActions = KeyboardActions(onNext = {
                 focusRequester.requestFocus()
-            })
+            }), enabled = competitionMode
         )
         OutlinedTextField(
             value = table,
-            onValueChange = {
-                modeSelectViewModel.setTableId(it.replace("[^0-9]".toRegex(), ""))
-            },
+            onValueChange = updateTable,
             isError = !table.isInt(),
             label = {
                 Text(text = "Quadra")
@@ -138,9 +153,10 @@ private fun Send(
                 if (isError) return@KeyboardActions
                 onSend()
             }),
-            modifier = Modifier.focusRequester(focusRequester)
+            modifier = Modifier.focusRequester(focusRequester),
+            enabled = competitionMode
         )
-        Button(onClick = onSend, enabled = !isError) {
+        Button(onClick = onSend, enabled = !competitionMode || !isError) {
             Text(text = "ENVIAR")
         }
     }
@@ -148,16 +164,15 @@ private fun Send(
 
 @Composable
 fun Receive(
-    modeSelectViewModel: ModeSelectViewModel,
+    updateTable: (String) -> Unit,
+    table: String,
+    competitionMode: Boolean,
     onSend: () -> Unit
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        val table by modeSelectViewModel.table.collectAsState()
         OutlinedTextField(
             value = table,
-            onValueChange = {
-                modeSelectViewModel.setTableId(it.replace("[^0-9]".toRegex(), ""))
-            },
+            onValueChange = updateTable,
             label = {
                 Text(text = "Quadra")
             },
@@ -169,9 +184,9 @@ fun Receive(
             keyboardActions = KeyboardActions(onSend = {
                 if (!table.isInt()) return@KeyboardActions
                 onSend()
-            })
+            }), enabled = competitionMode
         )
-        Button(onClick = onSend, enabled = table.isInt()) {
+        Button(onClick = onSend, enabled = !competitionMode || table.isInt()) {
             Text(text = "ENVIAR")
         }
     }

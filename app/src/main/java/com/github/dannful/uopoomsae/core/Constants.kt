@@ -16,4 +16,5 @@ object Constants {
     const val JUDGE_ID_KEY = "judgeId"
     const val USERNAME_KEY = "username"
     const val PASSWORD_KEY = "password"
+    const val AUTH_KEY = "auth"
 }

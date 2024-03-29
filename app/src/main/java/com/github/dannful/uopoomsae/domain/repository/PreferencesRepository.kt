@@ -1,5 +1,6 @@
 package com.github.dannful.uopoomsae.domain.repository
 
+import com.github.dannful.uopoomsae.domain.model.Permissions
 import kotlinx.coroutines.flow.Flow
 
 interface PreferencesRepository {
@@ -19,4 +20,7 @@ interface PreferencesRepository {
     fun getPassword(): Flow<String>
 
     suspend fun savePassword(password: String)
+
+    fun getCurrentAuth(): Flow<Permissions>
+    suspend fun saveCurrentAuth(permissions: Permissions)
 }

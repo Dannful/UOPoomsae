@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
-import com.github.dannful.uopoomsae.domain.repository.ScoreRepository
+import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
@@ -16,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FreestyleScoreViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val scoreRepository: ScoreRepository,
+    private val remoteRepository: RemoteRepository,
     private val preferencesRepository: PreferencesRepository,
     private val application: Application
 ) : ViewModel() {
@@ -80,25 +80,26 @@ class FreestyleScoreViewModel @Inject constructor(
     fun send() {
         viewModelScope.launch {
             val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: true
+            if (!competitionMode) return@launch
             val judgeId = preferencesRepository.getJudgeId().firstOrNull() ?: run {
-                if (competitionMode) displayRequestFailure(application)
+                displayRequestFailure(application)
                 return@launch
             }
             val tableId = preferencesRepository.getTableId().firstOrNull() ?: run {
-                if (competitionMode) displayRequestFailure(application)
+                displayRequestFailure(application)
                 return@launch
             }
             val presentationScore = calculatePresentation()
             val accuracyScore = calculateTechnique()
-            val result = scoreRepository.sendScore(
+            val result = remoteRepository.sendScore(
                 ScoreData(
-                    judgeId = judgeId,
-                    tableId = tableId,
+                    judgeId = judgeId.toShort(),
+                    tableId = tableId.toShort(),
                     presentationScore = presentationScore,
                     accuracyScore = accuracyScore
                 )
             )
-            if (result.isFailure && competitionMode) displayRequestFailure(application)
+            if (result.isFailure) displayRequestFailure(application)
         }
     }
 }

@@ -3,17 +3,19 @@ package com.github.dannful.uopoomsae.presentation.login_screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
+import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val preferencesRepository: PreferencesRepository,
+    private val remoteRepository: RemoteRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -24,8 +26,12 @@ class LoginViewModel @Inject constructor(
     }
 
     init {
-        preferencesRepository.getUsername().onEach(::onUsernameChanged).launchIn(viewModelScope)
-        preferencesRepository.getPassword().onEach(::onPasswordChanged).launchIn(viewModelScope)
+        viewModelScope.launch {
+            preferencesRepository.getUsername().collectLatest(::onUsernameChanged)
+        }
+        viewModelScope.launch {
+            preferencesRepository.getPassword().collectLatest(::onPasswordChanged)
+        }
     }
 
     val username = savedStateHandle.getStateFlow(USERNAME_KEY, "")
@@ -39,10 +45,13 @@ class LoginViewModel @Inject constructor(
         savedStateHandle[PASSWORD_KEY] = password
     }
 
-    fun submit() {
+    fun submit(onSubmit: (Boolean) -> Unit) {
         viewModelScope.launch {
             preferencesRepository.saveUsername(username.value)
             preferencesRepository.savePassword(password.value)
+            val userAuth = remoteRepository.getUserAuth().first()
+            preferencesRepository.saveCurrentAuth(userAuth)
+            onSubmit(userAuth.level >= Permissions.USER.level)
         }
     }
 }

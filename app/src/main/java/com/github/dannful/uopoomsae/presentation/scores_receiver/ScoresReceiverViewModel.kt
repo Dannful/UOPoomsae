@@ -5,7 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
-import com.github.dannful.uopoomsae.domain.repository.ScoreRepository
+import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScoresReceiverViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    private val scoreRepository: ScoreRepository,
+    private val remoteRepository: RemoteRepository,
     private val preferencesRepository: PreferencesRepository,
     private val application: Application
 ) : ViewModel() {
@@ -35,6 +35,7 @@ class ScoresReceiverViewModel @Inject constructor(
         savedStateHandle.getStateFlow(SCORES_KEY, List(JUDGE_COUNT) { ScoreBundle(0f, 0f) })
 
     val lastFetch = savedStateHandle.getStateFlow(FETCH_COOLDOWN_KEY, 0)
+    val isCompetitionMode = preferencesRepository.getCompetitionMode()
 
     init {
         resetScores()
@@ -53,11 +54,12 @@ class ScoresReceiverViewModel @Inject constructor(
     fun fetchScores() {
         viewModelScope.launch {
             if (lastFetch.value > 0) return@launch
+            val competitionMode =
+                isCompetitionMode.firstOrNull() ?: true
+            if (!competitionMode) return@launch
             preferencesRepository.getTableId().collectLatest { tableId ->
-                val competitionMode =
-                    preferencesRepository.getCompetitionMode().firstOrNull() ?: true
-                val result = scoreRepository.getScores(tableId)
-                if (result.isFailure && competitionMode) {
+                val result = remoteRepository.getScores(tableId.toShort())
+                if (result.isFailure) {
                     displayRequestFailure(application)
                     return@collectLatest
                 }

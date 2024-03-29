@@ -48,13 +48,16 @@ fun ScoresReceiverScreen(
                 Text(text = "ZERAR PLACAR")
             }
             val fetchCooldown by scoresReceiverViewModel.lastFetch.collectAsState()
+            val isCompetitionMode by scoresReceiverViewModel.isCompetitionMode.collectAsState(
+                initial = true
+            )
             Button(
                 onClick = scoresReceiverViewModel::fetchScores,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                enabled = fetchCooldown == 0
+                enabled = fetchCooldown == 0 && isCompetitionMode
             ) {
                 Text(text = "OBTER DADOS${if (fetchCooldown > 0) " ($fetchCooldown)" else ""}")
             }
