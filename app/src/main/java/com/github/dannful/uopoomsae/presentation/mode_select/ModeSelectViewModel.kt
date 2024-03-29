@@ -60,7 +60,7 @@ class ModeSelectViewModel @Inject constructor(
 
     fun submit() {
         viewModelScope.launch {
-            val isCompetitionMode = competitionMode.firstOrNull() ?: true
+            val isCompetitionMode = competitionMode.firstOrNull() ?: false
             if (!isCompetitionMode) return@launch
             val convertedJudge = judge.value.toIntOrNull() ?: return@launch
             val convertedTable = table.value.toIntOrNull() ?: return@launch

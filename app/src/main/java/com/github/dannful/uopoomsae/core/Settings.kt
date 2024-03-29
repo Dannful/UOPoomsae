@@ -9,4 +9,5 @@ object Settings {
     const val AUTH_PATH = "/auth"
     const val SOCKET_PATH = "/socket"
     const val HTTP_PATH = "/scores"
+    const val AUTH_CURRENT_PATH = "current"
 }

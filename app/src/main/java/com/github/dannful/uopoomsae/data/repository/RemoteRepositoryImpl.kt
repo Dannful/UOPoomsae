@@ -11,7 +11,10 @@ import io.ktor.client.plugins.resources.post
 import io.ktor.client.plugins.websocket.receiveDeserialized
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
 import io.ktor.resources.Resource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +30,11 @@ class RemoteRepositoryImpl(
 ) : RemoteRepository {
 
     @Resource(Settings.AUTH_PATH)
-    private class Auth
+    private class Auth {
+
+        @Resource(Settings.AUTH_CURRENT_PATH)
+        class Current(val parent: Auth = Auth())
+    }
 
     @Resource(Settings.HTTP_PATH)
     private class Scores {
@@ -38,9 +45,6 @@ class RemoteRepositoryImpl(
             @Resource("{judgeId}")
             class JudgeId(val parent: TableId, val judgeId: Short)
         }
-
-        @Resource("new")
-        class New(val parent: Scores = Scores(), val scoreData: ScoreData)
     }
 
     override fun scoresChannel(): Flow<ScoreData> = channelFlow {
@@ -64,10 +68,11 @@ class RemoteRepositoryImpl(
     override fun scoreChannelById(tableId: Short): Flow<ScoreData> = scoresChannel().filter {
         it.tableId == tableId
     }
+
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun getUserAuth(): Flow<Permissions> = networkClient.mapLatest { client ->
         try {
-            val request = client.get(Auth())
+            val request = client.get(Auth.Current())
             request.body()
         } catch (e: Exception) {
             Permissions.NONE
@@ -110,7 +115,10 @@ class RemoteRepositoryImpl(
     override suspend fun sendScore(scoreData: ScoreData): Result<Unit> {
         val client = networkClient.firstOrNull() ?: return Result.failure(NullPointerException())
         return try {
-            client.post(Scores.New(scoreData = scoreData))
+            client.post(Scores()) {
+                contentType(ContentType.Application.Json)
+                setBody(scoreData)
+            }
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

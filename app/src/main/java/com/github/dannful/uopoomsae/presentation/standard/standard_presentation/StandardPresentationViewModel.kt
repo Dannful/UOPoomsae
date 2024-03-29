@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.core.Route
+import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
@@ -72,7 +73,9 @@ class StandardPresentationViewModel @Inject constructor(
 
     fun send() {
         viewModelScope.launch {
-            val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: true
+            val authUser = preferencesRepository.getCurrentAuth().firstOrNull() ?: return@launch
+            if (authUser.level < Permissions.USER.level) return@launch
+            val competitionMode = preferencesRepository.getCompetitionMode().firstOrNull() ?: false
             if (!competitionMode) return@launch
             val tableId = preferencesRepository.getTableId().firstOrNull() ?: run {
                 displayRequestFailure(application)

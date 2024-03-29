@@ -45,7 +45,7 @@ fun ModeSelectScreen(
         mutableIntStateOf(0)
     }
     val isUserAdmin by modeSelectViewModel.isUserAdmin.collectAsState(initial = false)
-    val competitionMode by modeSelectViewModel.competitionMode.collectAsState(initial = true)
+    val competitionMode by modeSelectViewModel.competitionMode.collectAsState(initial = false)
     Scaffold(topBar = {
         if (isUserAdmin) {
             TabRow(
@@ -186,7 +186,7 @@ fun Receive(
                 onSend()
             }), enabled = competitionMode
         )
-        Button(onClick = onSend, enabled = !competitionMode || table.isInt()) {
+        Button(onClick = onSend, enabled = competitionMode && table.isInt()) {
             Text(text = "ENVIAR")
         }
     }
