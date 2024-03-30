@@ -31,7 +31,7 @@ fun ButtonGradient(
     boxSize: Dp = 48.dp,
     initialColor: Color,
     finalColor: Color,
-    groupSize: Int = 1,
+    groupSize: Int,
     values: List<String>,
     isSelected: (Int) -> Boolean,
     onClick: (Int) -> Unit
@@ -43,11 +43,11 @@ fun ButtonGradient(
     ) {
         itemsIndexed(values,
             key = { index, _ -> index }) { index, item ->
-            val size = values.size / groupSize
+            val maxIndex = values.size / groupSize
             val group = index / groupSize
-            val red = interpolateColor(initialColor.red, finalColor.red, group, size)
-            val green = interpolateColor(initialColor.green, finalColor.green, group, size)
-            val blue = interpolateColor(initialColor.blue, finalColor.blue, group, size)
+            val red = interpolateColor(initialColor.red, finalColor.red, group, maxIndex)
+            val green = interpolateColor(initialColor.green, finalColor.green, group, maxIndex)
+            val blue = interpolateColor(initialColor.blue, finalColor.blue, group, maxIndex)
             val color =
                 Color(red.coerceIn(0f..255f), green.coerceIn(0f..255f), blue.coerceIn(0f..255f))
             val animatedColor by

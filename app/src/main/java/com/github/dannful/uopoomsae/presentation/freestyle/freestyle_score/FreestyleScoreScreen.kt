@@ -102,7 +102,7 @@ private fun NamedButtonGradient(
                 initialColor = Constants.DEFAULT_FIRST_COLOR,
                 finalColor = Color.Black,
                 values = FreestyleScoreViewModel.values.map { it.toString() },
-                isSelected = isSelected, onClick = onClick
+                isSelected = isSelected, onClick = onClick, groupSize = 2
             )
         }
         HorizontalDivider()

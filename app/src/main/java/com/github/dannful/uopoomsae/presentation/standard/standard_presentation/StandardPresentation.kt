@@ -99,7 +99,8 @@ private fun ColumnScope.NamedGradient(
             finalColor = Color.Black,
             values = values,
             isSelected = isSelected,
-            onClick = onSelect
+            onClick = onSelect,
+            groupSize = 3
         )
     }
 }
