@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -23,10 +22,6 @@ import com.github.dannful.uopoomsae.presentation.standard.standard_results.stand
 import com.github.dannful.uopoomsae.presentation.standard.standard_technique.standardTechniqueScreen
 import com.github.dannful.uopoomsae.ui.theme.UOReceiverTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.resources.post
-import io.ktor.resources.Resource
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -14,13 +14,6 @@ interface PreferencesRepository {
     suspend fun saveJudgeId(judgeId: Int)
     fun getJudgeId(): Flow<Int>
 
-    fun getUsername(): Flow<String>
-    suspend fun saveUsername(username: String)
-
-    fun getPassword(): Flow<String>
-
-    suspend fun savePassword(password: String)
-
     fun getCurrentAuth(): Flow<Permissions>
     suspend fun saveCurrentAuth(permissions: Permissions)
 }

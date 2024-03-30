@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onCompletion
 
 class RemoteRepositoryImpl(
     private val networkClient: Flow<HttpClient>
@@ -48,9 +47,7 @@ class RemoteRepositoryImpl(
     }
 
     override fun scoresChannel(): Flow<ScoreData> = channelFlow {
-        networkClient.onCompletion {
-            close()
-        }.collectLatest { client ->
+        networkClient.collectLatest { client ->
             client.webSocket(
                 method = HttpMethod.Get,
                 host = Settings.SERVER_URL,
@@ -76,8 +73,6 @@ class RemoteRepositoryImpl(
             request.body()
         } catch (e: Exception) {
             Permissions.NONE
-        } finally {
-            client.close()
         }
     }
 
@@ -88,8 +83,6 @@ class RemoteRepositoryImpl(
             Result.success(request.body<List<ScoreData>>())
         } catch (e: Exception) {
             Result.failure(e)
-        } finally {
-            client.close()
         }
     }
 
@@ -107,8 +100,6 @@ class RemoteRepositoryImpl(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
-        } finally {
-            client.close()
         }
     }
 
@@ -122,8 +113,6 @@ class RemoteRepositoryImpl(
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
-        } finally {
-            client.close()
         }
     }
 }

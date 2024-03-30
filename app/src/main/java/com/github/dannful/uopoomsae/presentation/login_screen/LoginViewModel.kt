@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.domain.model.Permissions
+import com.github.dannful.uopoomsae.domain.repository.AuthRepository
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +15,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val preferencesRepository: PreferencesRepository,
+    private val authRepository: AuthRepository,
     private val remoteRepository: RemoteRepository,
+    private val preferencesRepository: PreferencesRepository,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -23,19 +25,22 @@ class LoginViewModel @Inject constructor(
 
         private const val USERNAME_KEY = "username"
         private const val PASSWORD_KEY = "password"
+        private const val LOADING_KEY = "loading"
     }
 
     init {
         viewModelScope.launch {
-            preferencesRepository.getUsername().collectLatest(::onUsernameChanged)
+            authRepository.getUsername().collectLatest(::onUsernameChanged)
         }
         viewModelScope.launch {
-            preferencesRepository.getPassword().collectLatest(::onPasswordChanged)
+            authRepository.getPassword().collectLatest(::onPasswordChanged)
         }
     }
 
     val username = savedStateHandle.getStateFlow(USERNAME_KEY, "")
     val password = savedStateHandle.getStateFlow(PASSWORD_KEY, "")
+
+    val loading = savedStateHandle.getStateFlow(LOADING_KEY, false)
 
     fun onUsernameChanged(username: String) {
         savedStateHandle[USERNAME_KEY] = username
@@ -47,10 +52,12 @@ class LoginViewModel @Inject constructor(
 
     fun submit(onSubmit: (Boolean) -> Unit) {
         viewModelScope.launch {
-            preferencesRepository.saveUsername(username.value)
-            preferencesRepository.savePassword(password.value)
+            savedStateHandle[LOADING_KEY] = true
+            authRepository.saveUsername(username.value)
+            authRepository.savePassword(password.value)
             val userAuth = remoteRepository.getUserAuth().first()
             preferencesRepository.saveCurrentAuth(userAuth)
+            savedStateHandle[LOADING_KEY] = false
             onSubmit(userAuth.level >= Permissions.USER.level)
         }
     }
