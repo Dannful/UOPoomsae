@@ -1,5 +1,6 @@
 package com.github.dannful.uopoomsae.presentation.mode_select
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -84,8 +86,10 @@ fun ModeSelectScreen(
             }
             val judge by modeSelectViewModel.judge.collectAsState()
             val table by modeSelectViewModel.table.collectAsState()
+            val isSubmitting by modeSelectViewModel.submitting.collectAsState()
             when (selectedTab) {
                 0 -> Send(
+                    isSubmitting = isSubmitting,
                     updateJudge = {
                         modeSelectViewModel.setJudgeId(it)
                     },
@@ -96,15 +100,15 @@ fun ModeSelectScreen(
                     judge = judge,
                     table = table
                 ) {
-                    modeSelectViewModel.submit()
-                    onSend()
+                    modeSelectViewModel.submit(onFinished = onSend)
                 }
 
-                1 -> Receive(updateTable = {
-                    modeSelectViewModel.setTableId(it)
-                }, table = table, competitionMode = competitionMode) {
-                    modeSelectViewModel.submit()
-                    onReceive()
+                1 -> Receive(
+                    isSubmitting = isSubmitting, updateTable = {
+                        modeSelectViewModel.setTableId(it)
+                    }, table = table, competitionMode = competitionMode
+                ) {
+                    modeSelectViewModel.submit(onFinished = onReceive)
                 }
             }
         }
@@ -118,9 +122,11 @@ private fun Send(
     judge: String,
     table: String,
     competitionMode: Boolean,
+    isSubmitting: Boolean,
     onSend: () -> Unit
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(
+        LocalSpacing.current.small)) {
         val focusRequester = remember { FocusRequester() }
         val isError = !judge.isInt() || !table.isInt()
         OutlinedTextField(
@@ -156,8 +162,12 @@ private fun Send(
             modifier = Modifier.focusRequester(focusRequester),
             enabled = competitionMode
         )
-        Button(onClick = onSend, enabled = !competitionMode || !isError) {
-            Text(text = "ENVIAR")
+        if (!isSubmitting) {
+            Button(onClick = onSend, enabled = !competitionMode || !isError) {
+                Text(text = "ENVIAR")
+            }
+        } else {
+            CircularProgressIndicator()
         }
     }
 }
@@ -167,9 +177,11 @@ fun Receive(
     updateTable: (String) -> Unit,
     table: String,
     competitionMode: Boolean,
-    onSend: () -> Unit
+    isSubmitting: Boolean,
+    onSend: () -> Unit,
 ) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(
+        LocalSpacing.current.small)) {
         OutlinedTextField(
             value = table,
             onValueChange = updateTable,
@@ -186,8 +198,12 @@ fun Receive(
                 onSend()
             }), enabled = competitionMode
         )
-        Button(onClick = onSend, enabled = competitionMode && table.isInt()) {
-            Text(text = "ENVIAR")
+        if (!isSubmitting) {
+            Button(onClick = onSend, enabled = competitionMode && table.isInt()) {
+                Text(text = "ENVIAR")
+            }
+        } else {
+            CircularProgressIndicator()
         }
     }
 }

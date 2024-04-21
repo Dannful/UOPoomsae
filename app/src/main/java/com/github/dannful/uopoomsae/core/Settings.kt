@@ -2,7 +2,7 @@ package com.github.dannful.uopoomsae.core
 
 object Settings {
 
-    const val SERVER_URL = "blissful-axiom-418223.rj.r.appspot.com"
+    const val SERVER_URL = "uo-poomsae.rj.r.appspot.com"
     const val SERVER_PORT = 80
 
     const val AUTH_REALM = "UOPoomsaeAuth"
