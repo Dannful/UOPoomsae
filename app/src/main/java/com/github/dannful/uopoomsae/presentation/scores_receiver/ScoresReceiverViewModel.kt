@@ -36,7 +36,6 @@ class ScoresReceiverViewModel @Inject constructor(
         private const val SCORES_KEY = "scores"
         private const val FETCH_COOLDOWN_KEY = "last"
         private const val FETCH_COOLDOWN_SECONDS = 5
-        private const val RECENT_UPDATE_TIME_SECONDS = 30
         const val JUDGE_COUNT = 5
     }
 
@@ -65,12 +64,6 @@ class ScoresReceiverViewModel @Inject constructor(
 
     private fun addRecentUpdate(judgeId: Int) {
         changes.add(judgeId)
-        viewModelScope.launch(dispatcherProvider.IO) {
-            delay(1000L * RECENT_UPDATE_TIME_SECONDS)
-            withContext(dispatcherProvider.Main) {
-                changes.remove(judgeId)
-            }
-        }
     }
 
     fun fetchScores() {
@@ -111,5 +104,6 @@ class ScoresReceiverViewModel @Inject constructor(
 
     fun resetScores() {
         savedStateHandle[SCORES_KEY] = List(JUDGE_COUNT) { ScoreBundle(0f, 0f) }
+        changes.clear()
     }
 }
