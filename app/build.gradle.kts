@@ -9,17 +9,26 @@ plugins {
 android {
     namespace = "com.github.dannful.uopoomsae"
     compileSdk = 34
+    buildFeatures.buildConfig = true
 
     defaultConfig {
         applicationId = "com.github.dannful.uopoomsae"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = properties["VERSION_CODE"].toString().toInt()
+        versionName = properties["VERSION_NAME"].toString()
+        buildConfigField("String", "SERVER_HOST", "\"${properties["SERVER_HOST"].toString()}\"")
+        buildConfigField("int", "SERVER_PORT", properties["SERVER_PORT"].toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("$rootDir/debug.keystore")
         }
     }
 
@@ -44,7 +53,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.14"
     }
     packaging {
         resources {

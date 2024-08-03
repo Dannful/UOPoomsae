@@ -1,0 +1,100 @@
+name: Build APK
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: choice
+        description: Version
+        options:
+          - Major
+          - Minor
+          - Patch
+          - None
+env:
+  MAJOR: ${{ vars.FRONTEND_VERSION_MAJOR }}
+  MINOR: ${{ vars.FRONTEND_VERSION_MINOR }}
+  PATCH: ${{ vars.FRONTEND_VERSION_PATCH }}
+permissions:
+  id-token: write
+  contents: read
+jobs:
+  BuildPush:
+    name: Build APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache-dependency-path: |
+            /*.gradle*
+            /**/gradle-wrapper.properties
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@417ae3ccd767c252f5661f1ace9f835f9654f2b5
+
+      - name: Update version tag
+        env:
+          VERSION_MAJOR_VAR_NAME: FRONTEND_VERSION_MAJOR
+          VERSION_MINOR_VAR_NAME: FRONTEND_VERSION_MINOR
+          VERSION_PATCH_VAR_NAME: FRONTEND_VERSION_PATCH
+          TOKEN: ${{ secrets.UO_TOKEN }}
+        run: |
+          case ${{ inputs.version }} in
+              None)   ;;
+              Major)  echo "MAJOR=$((MAJOR+1))" >> $GITHUB_ENV
+                      echo "MINOR=0" >> $GITHUB_ENV
+                      echo "PATCH=0" >> $GITHUB_ENV
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url }}/repos/${{ github.repository }}/actions/variables/$VERSION_MAJOR_VAR_NAME \
+                          -d "{\"name\": \"$VERSION_MAJOR_VAR_NAME\", \"value\": \"$((MAJOR+1))\"}"
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url}}/repos/${{ github.repository }}/actions/variables/$VERSION_MINOR_VAR_NAME \
+                          -d '{"name": "$VERSION_MINOR_VAR_NAME", "value": "0"}'
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url}}/repos/${{ github.repository }}/actions/variables/$VERSION_PATCH_VAR_NAME \
+                          -d '{"name": "$VERSION_PATCH_VAR_NAME", "value": "0"}'
+                      ;;
+              Minor)  echo "MINOR=$((MINOR+1))" >> $GITHUB_ENV
+                      echo "PATCH=0" >> $GITHUB_ENV
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url}}/repos/${{ github.repository }}/actions/variables/$VERSION_MINOR_VAR_NAME \
+                          -d "{\"name\": \"$VERSION_MINOR_VAR_NAME\", \"value\": \"$((MINOR+1))\"}"
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url}}/repos/${{ github.repository }}/actions/variables/$VERSION_PATCH_VAR_NAME \
+                          -d '{"name": "$VERSION_PATCH_VAR_NAME", "value": "0"))}'
+                      ;;
+              Patch)  echo "PATCH=$((PATCH+1))" >> $GITHUB_ENV
+                      curl -L -X PATCH -H "Accept: application/vnd.github+json" \
+                          -H "Authorization: Bearer $TOKEN" \
+                          -H "X-GitHub-Api-Version: 2022-11-28" \
+                          ${{ github.api_url}}/repos/${{ github.repository }}/actions/variables/$VERSION_PATCH_VAR_NAME \
+                          -d "{\"name\": \"$VERSION_PATCH_VAR_NAME\", \"value\": \"$((PATCH+1))\"}"
+                      ;;
+          esac
+
+      - name: Build APK
+        run: chmod +x ./gradlew && ./gradlew assembleRelease -PVERSION_NAME=${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }} -PVERSION_CODE=${{ github.run_number }} -PSERVER_HOST=${{ secrets.SERVER_HOST }} -PSERVER_PORT=${{ secrets.SERVER_PORT }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        id: create_release
+        with:
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+          token: ${{ secrets.UO_TOKEN }}
+          tag_name: ${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}
+          name: ${{ env.MAJOR }}.${{ env.MINOR }}.${{ env.PATCH }}

@@ -2,11 +2,12 @@ package com.github.dannful.uopoomsae.domain.repository
 
 import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
-import kotlinx.coroutines.flow.Flow
+import com.github.dannful.uopoomsae.domain.model.UserCredentials
 
 interface RemoteRepository {
 
-    fun getUserAuth(): Flow<Permissions>
+    suspend fun getUserAuth(): Permissions
     suspend fun getScores(tableId: Short): Result<List<ScoreData>>
     suspend fun sendScore(scoreData: ScoreData): Result<Unit>
+    suspend fun login(userCredentials: UserCredentials): Result<Unit>
 }

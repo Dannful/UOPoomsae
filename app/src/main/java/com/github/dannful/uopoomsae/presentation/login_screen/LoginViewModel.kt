@@ -4,12 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.dannful.uopoomsae.domain.model.Permissions
+import com.github.dannful.uopoomsae.domain.model.UserCredentials
 import com.github.dannful.uopoomsae.domain.repository.AuthRepository
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -55,7 +55,8 @@ class LoginViewModel @Inject constructor(
             savedStateHandle[LOADING_KEY] = true
             authRepository.saveUsername(username.value)
             authRepository.savePassword(password.value)
-            val userAuth = remoteRepository.getUserAuth().first()
+            remoteRepository.login(UserCredentials(username.value, password.value))
+            val userAuth = remoteRepository.getUserAuth()
             preferencesRepository.saveCurrentAuth(userAuth)
             savedStateHandle[LOADING_KEY] = false
             onSubmit(userAuth.level >= Permissions.USER.level)

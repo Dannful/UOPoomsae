@@ -3,6 +3,7 @@ package com.github.dannful.uopoomsae.data.repository
 import com.github.dannful.uopoomsae.core.Settings
 import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
+import com.github.dannful.uopoomsae.domain.model.UserCredentials
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -12,21 +13,20 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.resources.Resource
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.mapLatest
 
 class RemoteRepositoryImpl(
-    private val networkClient: Flow<HttpClient>
+    private val networkClient: HttpClient
 ) : RemoteRepository {
 
     @Resource(Settings.AUTH_PATH)
+    @Suppress("unused")
     private class Auth {
 
         @Resource(Settings.AUTH_CURRENT_PATH)
-        @Suppress("unused")
         class Current(val parent: Auth = Auth())
+
+        @Resource(Settings.AUTH_LOGIN_PATH)
+        class Login(val parent: Auth = Auth())
     }
 
     @Resource(Settings.HTTP_PATH)
@@ -41,20 +41,18 @@ class RemoteRepositoryImpl(
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override fun getUserAuth(): Flow<Permissions> = networkClient.mapLatest { client ->
+    override suspend fun getUserAuth(): Permissions {
         try {
-            val request = client.get(Auth.Current())
-            request.body()
+            val request = networkClient.get(Auth.Current())
+            return request.body()
         } catch (e: Exception) {
-            Permissions.NONE
+            return Permissions.NONE
         }
     }
 
     override suspend fun getScores(tableId: Short): Result<List<ScoreData>> {
-        val client = networkClient.firstOrNull() ?: return Result.failure(NullPointerException())
         return try {
-            val request = client.get(Scores.TableId(tableId = tableId))
+            val request = networkClient.get(Scores.TableId(tableId = tableId))
             Result.success(request.body<List<ScoreData>>())
         } catch (e: Exception) {
             Result.failure(e)
@@ -62,11 +60,22 @@ class RemoteRepositoryImpl(
     }
 
     override suspend fun sendScore(scoreData: ScoreData): Result<Unit> {
-        val client = networkClient.firstOrNull() ?: return Result.failure(NullPointerException())
         return try {
-            client.post(Scores()) {
+            networkClient.post(Scores()) {
                 contentType(ContentType.Application.Json)
                 setBody(scoreData)
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun login(userCredentials: UserCredentials): Result<Unit> {
+        return try {
+            networkClient.post(Auth.Login()) {
+                contentType(ContentType.Application.Json)
+                setBody(userCredentials)
             }
             Result.success(Unit)
         } catch (e: Exception) {

@@ -13,7 +13,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.scopes.ViewModelScoped
 import io.ktor.client.HttpClient
-import kotlinx.coroutines.flow.Flow
 
 @Module
 @InstallIn(ViewModelComponent::class)
@@ -29,6 +28,6 @@ class ViewModelModule {
     @Provides
     @ViewModelScoped
     fun provideScoreRepository(
-        clients: Flow<HttpClient>
-    ): RemoteRepository = RemoteRepositoryImpl(clients)
+        client: HttpClient
+    ): RemoteRepository = RemoteRepositoryImpl(client)
 }
