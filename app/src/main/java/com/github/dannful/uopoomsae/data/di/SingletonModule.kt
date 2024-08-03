@@ -27,10 +27,9 @@ import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.runningReduce
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
@@ -61,8 +60,8 @@ class SingletonModule {
     @Singleton
     fun provideNetworkClient(
         authRepository: AuthRepository
-    ): Flow<HttpClient> {
-        val flow = authRepository.getUsername().flatMapLatest { username ->
+    ): Flow<HttpClient> =
+        authRepository.getUsername().flatMapLatest { username ->
             authRepository.getPassword().map { password ->
                 HttpClient {
                     install(ContentNegotiation) {
@@ -94,9 +93,8 @@ class SingletonModule {
                     install(Resources)
                 }
             }
+        }.runningReduce { oldClient, newClient ->
+            oldClient.close()
+            newClient
         }
-        return flow.onEach {
-	        flow.firstOrNull()?.close()
-        }
-    }
 }

@@ -6,10 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface RemoteRepository {
 
-    fun scoresChannel(): Flow<ScoreData>
-    fun scoreChannelById(tableId: Short): Flow<ScoreData>
     fun getUserAuth(): Flow<Permissions>
     suspend fun getScores(tableId: Short): Result<List<ScoreData>>
-    suspend fun sendScoreSocket(scoreData: ScoreData): Result<Unit>
     suspend fun sendScore(scoreData: ScoreData): Result<Unit>
 }
