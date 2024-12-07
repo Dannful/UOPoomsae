@@ -8,9 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.presentation.core.FinishButtonGroup
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
@@ -20,25 +18,31 @@ import com.github.dannful.uopoomsae.presentation.core.PerformanceResult
 fun StandardResultsScreen(
     standardResultsViewModel: StandardResultsViewModel = viewModel(),
     onSelectMode: () -> Unit,
-    onFinish: () -> Unit
+    onFinish: (Int) -> Unit
 ) {
     PageHeader(bottomBar = {
         FinishButtonGroup(
             onSelectMode = onSelectMode,
-            onFinish = onFinish
+            onFinish = {
+                onFinish(standardResultsViewModel.techniqueScore.size)
+            }
         )
     }) {
+        val techniqueScores = standardResultsViewModel.techniqueScore
+        val presentationScores = standardResultsViewModel.presentationScore
+        val scores = mutableMapOf<String, Float>()
+        for (i in techniqueScores.indices) {
+            scores["PRECISÃO ${i + 1}"] = techniqueScores[i]
+            scores["APRESENTAÇÃO ${i + 1}"] = presentationScores[i]
+        }
         Box(
             modifier = Modifier
-                .weight(4f)
-                .fillMaxSize(), contentAlignment = Alignment.Center
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             PerformanceResult(
-                values = mapOf(
-                    "PRECISÃO" to standardResultsViewModel.techniqueScore,
-                    "APRESENTAÇÃO" to standardResultsViewModel.presentationScore,
-                    "NOTA FINAL" to standardResultsViewModel.techniqueScore + standardResultsViewModel.presentationScore
-                )
+                if (techniqueScores.size == 1) 2 else techniqueScores.size,
+                scores
             )
         }
     }
@@ -47,18 +51,11 @@ fun StandardResultsScreen(
 fun NavGraphBuilder.standardResultsRoute(
     controller: NavController
 ) {
-    composable(Route.StandardResults.toString(), arguments = listOf(
-        navArgument(Route.StandardResults.arguments[0].toString()) {
-            type = NavType.FloatType
-        },
-        navArgument(Route.StandardResults.arguments[1].toString()) {
-            type = NavType.FloatType
-        }
-    )) {
+    composable<Route.StandardResults> {
         StandardResultsScreen(onSelectMode = {
-            controller.navigate(Route.CompetitionType.toString())
+            controller.navigate(Route.CompetitionType)
         }, onFinish = {
-            controller.navigate(Route.StandardTechnique.toString())
+            controller.navigate(Route.StandardTechnique(count = it))
         })
     }
 }

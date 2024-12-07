@@ -7,9 +7,12 @@ import javax.inject.Inject
 
 class FreestyleResultsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
-    val accuracyScore = savedStateHandle.get<Float>(Route.FreestyleResults.arguments[0].toString()) ?: 0f
-    val presentationScore = savedStateHandle.get<Float>(Route.FreestyleResults.arguments[1].toString()) ?: 0f
-    val stanceDecrease = savedStateHandle.get<Float>(Route.FreestyleResults.arguments[2].toString()) ?: 0f
+    val accuracyScore =
+        savedStateHandle.get<FloatArray>(Route.FreestyleResults::accuracy.name)!!
+    val presentationScore =
+        savedStateHandle.get<FloatArray>(Route.FreestyleResults::presentation.name)!!
+    val stanceDecrease =
+        savedStateHandle.get<FloatArray>(Route.FreestyleResults::stanceDecrease.name)!!
 }

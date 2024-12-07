@@ -1,5 +1,5 @@
 [versions]
-androidApplication = "8.5.1"
+androidApplication = "8.1.2"
 kotlinAndroid = "1.9.24"
 ktor = "2.3.10"
 hilt = "2.51.1"
@@ -14,6 +14,7 @@ jUnit = "4.13.2"
 espresso = "3.6.1"
 androidJUnit = "1.2.1"
 dataStore = "1.1.1"
+navigation = "2.8.4"
 
 [libraries]
 ktor-client-resources = { group = "io.ktor", name = "ktor-client-resources", version.ref = "ktor" }
@@ -42,6 +43,7 @@ androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "composeUi" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeMaterial" }
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "dataStore" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 
 junit = { group = "junit", name = "junit", version.ref = "jUnit" }
 

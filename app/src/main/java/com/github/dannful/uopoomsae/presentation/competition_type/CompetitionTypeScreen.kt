@@ -15,6 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -25,14 +29,25 @@ import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.R
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+
+private enum class PageState {
+    SELECTING_COMPETITION_TYPE,
+    SELECTING_STANDARD_TYPE
+}
 
 @Composable
 fun CompetitionTypeScreen(
     competitionTypeViewModel: CompetitionTypeViewModel = hiltViewModel(),
     standardMode: () -> Unit,
+    multipleMode: () -> Unit,
     freestyleMode: () -> Unit,
     onBack: (Route) -> Unit
 ) {
+    var pageState by rememberSaveable {
+        mutableStateOf(PageState.SELECTING_COMPETITION_TYPE)
+    }
     Box(
         modifier = Modifier
             .padding(LocalSpacing.current.huge)
@@ -59,11 +74,26 @@ fun CompetitionTypeScreen(
                 verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
                 modifier = Modifier.weight(1f)
             ) {
-                Button(onClick = standardMode, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Reconhecido")
-                }
-                Button(onClick = freestyleMode, modifier = Modifier.fillMaxWidth()) {
-                    Text(text = "Freestyle")
+                when (pageState) {
+                    PageState.SELECTING_COMPETITION_TYPE -> {
+                        Button(onClick = {
+                            pageState = PageState.SELECTING_STANDARD_TYPE
+                        }, modifier = Modifier.fillMaxWidth()) {
+                            Text(text = "Reconhecido")
+                        }
+                        Button(onClick = freestyleMode, modifier = Modifier.fillMaxWidth()) {
+                            Text(text = "Freestyle")
+                        }
+                    }
+
+                    PageState.SELECTING_STANDARD_TYPE -> {
+                        Button(onClick = standardMode, modifier = Modifier.fillMaxWidth()) {
+                            Text(text = "Individual")
+                        }
+                        Button(onClick = multipleMode, modifier = Modifier.fillMaxWidth()) {
+                            Text(text = "Simultâneo")
+                        }
+                    }
                 }
             }
         }
@@ -73,16 +103,19 @@ fun CompetitionTypeScreen(
 fun NavGraphBuilder.competitionTypeRoute(
     controller: NavController
 ) {
-    composable(Route.CompetitionType.toString()) {
+    composable<Route.CompetitionType> {
         CompetitionTypeScreen(
             standardMode = {
-                controller.navigate(Route.StandardTechnique.toString())
+                controller.navigate(Route.StandardTechnique(count = 1))
             },
             freestyleMode = {
-                controller.navigate(Route.FreestyleScore.toString())
+                controller.navigate(Route.FreestyleScore(count = 1))
+            },
+            multipleMode = {
+                controller.navigate(Route.StandardTechnique(count = 2))
             },
             onBack = {
-                controller.navigate(it.toString())
+                controller.navigate(it)
             }
         )
     }

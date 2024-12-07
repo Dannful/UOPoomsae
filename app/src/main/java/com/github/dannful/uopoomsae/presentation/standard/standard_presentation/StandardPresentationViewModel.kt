@@ -25,9 +25,9 @@ class StandardPresentationViewModel @Inject constructor(
 
     companion object {
 
-        private const val SPEED_KEY = "speed"
-        private const val PACE_KEY = "pace"
-        private const val POWER_KEY = "power"
+        private const val SCORES_KEY = "presentation_scores"
+
+        private const val INITIAL_SCORE = 0.5f
 
         val values = listOf(
             0.5f,
@@ -49,26 +49,33 @@ class StandardPresentationViewModel @Inject constructor(
         )
     }
 
-    val speed = savedStateHandle.getStateFlow(SPEED_KEY, values.lastIndex)
-    val pace = savedStateHandle.getStateFlow(PACE_KEY, values.lastIndex)
-    val power = savedStateHandle.getStateFlow(POWER_KEY, values.lastIndex)
-    val previousScore =
-        savedStateHandle.get<Float>(Route.StandardPresentation.arguments[0].toString())
+    val previousScores =
+        savedStateHandle.get<FloatArray>(Route.StandardPresentation::techniqueScores.name)!!
+    val scores = savedStateHandle.getStateFlow(SCORES_KEY, previousScores.indices.map {
+        PresentationScore(INITIAL_SCORE, INITIAL_SCORE, INITIAL_SCORE)
+    })
 
-    fun setSpeed(index: Int) {
-        savedStateHandle[SPEED_KEY] = index
+    fun setValue(index: Int, score: PresentationScore) {
+        val map = scores.value.toMutableList()
+        map[index] = score
+        savedStateHandle[SCORES_KEY] = map
     }
 
-    fun setPace(index: Int) {
-        savedStateHandle[PACE_KEY] = index
+    fun setSpeed(index: Int, value: Float) {
+        setValue(index, scores.value[index].copy(speed = value))
     }
 
-    fun setPower(index: Int) {
-        savedStateHandle[POWER_KEY] = index
+    fun setPace(index: Int, value: Float) {
+        setValue(index, scores.value[index].copy(pace = value))
     }
 
-    fun calculateScore(): Float {
-        return values[speed.value] + values[pace.value] + values[power.value]
+    fun setPower(index: Int, value: Float) {
+        setValue(index, scores.value[index].copy(power = value))
+    }
+
+    fun calculateScore(index: Int): Float {
+        val score = scores.value[index]
+        return score.speed + score.pace + score.power
     }
 
     fun send() {
@@ -89,8 +96,8 @@ class StandardPresentationViewModel @Inject constructor(
                 ScoreData(
                     tableId = tableId.toShort(),
                     judgeId = judgeId.toShort(),
-                    accuracyScore = previousScore ?: return@launch,
-                    presentationScore = calculateScore()
+                    accuracyScores = previousScores.toList(),
+                    presentationScores = List(scores.value.size) { index -> calculateScore(index) }
                 )
             )
             if (result.isFailure)

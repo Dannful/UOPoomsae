@@ -67,15 +67,15 @@ class MainActivity : ComponentActivity() {
                     }
                     NavHost(
                         navController = controller,
-                        startDestination = Route.Login.toString()
+                        startDestination = Route.Login
                     ) {
                         loginRoute(controller)
                         modeSelectScreen(controller)
                         competitionTypeRoute(controller)
-                        standardTechniqueScreen(controller, scope)
-                        standardPresentationScreen(controller, scope)
+                        standardTechniqueScreen(controller)
+                        standardPresentationScreen(controller)
                         standardResultsRoute(controller)
-                        freestyleScoreRoute(controller, scope)
+                        freestyleScoreRoute(controller)
                         freestyleResultsRoute(controller)
                         scoresReceiverRoute()
                     }

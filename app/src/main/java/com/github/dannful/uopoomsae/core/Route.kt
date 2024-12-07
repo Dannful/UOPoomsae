@@ -1,77 +1,99 @@
 package com.github.dannful.uopoomsae.core
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 
-sealed class Route(
-    private val name: String,
-    val arguments: List<RouteArgument> = emptyList()
-) {
+sealed class Route {
 
-    object Login: Route("login")
-    object ModeSelect : Route("modeSelect")
-    object CompetitionType : Route("competitionType")
-    object StandardTechnique : Route("standardTechnique")
+    @Serializable
+    data object Login : Route()
 
-    object StandardPresentation : Route(
-        "standardPresentation", listOf(
-            RouteArgument("techniqueScore")
-        )
-    )
+    @Serializable
+    data object ModeSelect : Route()
 
-    object StandardResults : Route(
-        "standardResults", listOf(
-            RouteArgument("techniqueScore"),
-            RouteArgument("presentationScore")
-        )
-    )
+    @Serializable
+    data object CompetitionType : Route()
 
-    object FreestyleScore : Route("freestyleScore")
-    object FreestyleResults : Route("freestyleResults", listOf(
-        RouteArgument("accuracy"),
-        RouteArgument("presentation"),
-        RouteArgument("stanceDecrease")
-    ))
+    @Serializable
+    data class StandardTechnique(
+        val count: Int
+    ) : Route()
 
-    object ScoresReceiver: Route("scoresReceiver")
+    @Serializable
+    data class StandardPresentation(
+        val techniqueScores: FloatArray
+    ) : Route() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
 
-    private suspend fun insertArguments(base: String, arguments: Array<out String>): String =
-        withContext(Dispatchers.Default) {
-            val argumentsIterator = arguments.iterator()
-            var optionalAdded = false
-            return@withContext buildString {
-                append(base)
-                this@Route.arguments.forEach { argument ->
-                    if (!argumentsIterator.hasNext())
-                        return@forEach
-                    val next = argumentsIterator.next()
-                    if (next.isBlank())
-                        return@forEach
-                    val optionalArgument = "${argument.name}=$next"
-                    append(if (argument.optional) (if (optionalAdded) "&$optionalArgument" else "?$optionalArgument") else "/$next")
-                    if (argument.optional)
-                        optionalAdded = true
-                }
-            }
+            other as StandardPresentation
+
+            if (!techniqueScores.contentEquals(other.techniqueScores)) return false
+
+            return true
         }
 
-    suspend fun withArguments(vararg arguments: String) =
-        insertArguments(name, arguments)
-
-    private fun appendDestinationAndArguments(destination: String) = buildString {
-        val mandatoryArguments =
-            arguments.filter { !it.optional }.map { it.name }.toTypedArray()
-        val optionalArguments = arguments.filter { it.optional }.map { it.name }.toTypedArray()
-        append(destination)
-        if (mandatoryArguments.isNotEmpty())
-            append("/" + mandatoryArguments.joinToString("/") {
-                "{$it}"
-            })
-        if (optionalArguments.isNotEmpty())
-            append("?" + optionalArguments.joinToString("&") {
-                "$it={$it}"
-            })
+        override fun hashCode(): Int {
+            return techniqueScores.contentHashCode()
+        }
     }
 
-    override fun toString() = appendDestinationAndArguments(name)
+    @Serializable
+    data class StandardResults(
+        val techniqueScores: FloatArray,
+        val presentationScores: FloatArray
+    ) : Route() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as StandardResults
+
+            if (!techniqueScores.contentEquals(other.techniqueScores)) return false
+            if (!presentationScores.contentEquals(other.presentationScores)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = techniqueScores.contentHashCode()
+            result = 31 * result + presentationScores.contentHashCode()
+            return result
+        }
+    }
+
+    @Serializable
+    data class FreestyleScore(
+        val count: Int
+    ) : Route()
+
+    @Serializable
+    data class FreestyleResults(
+        val accuracy: FloatArray,
+        val presentation: FloatArray,
+        val stanceDecrease: FloatArray
+    ) : Route() {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as FreestyleResults
+
+            if (!accuracy.contentEquals(other.accuracy)) return false
+            if (!presentation.contentEquals(other.presentation)) return false
+            if (!stanceDecrease.contentEquals(other.stanceDecrease)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = accuracy.contentHashCode()
+            result = 31 * result + presentation.contentHashCode()
+            result = 31 * result + stanceDecrease.contentHashCode()
+            return result
+        }
+    }
+
+    @Serializable
+    data object ScoresReceiver : Route()
 }

@@ -111,9 +111,9 @@ fun LoginScreen(
 fun NavGraphBuilder.loginRoute(
     controller: NavController
 ) {
-    composable(Route.Login.toString()) {
+    composable<Route.Login> {
         LoginScreen {
-            controller.navigate(it.toString())
+            controller.navigate(it)
         }
     }
 }

@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class ScoreData(
     val tableId: Short,
     val judgeId: Short,
-    val presentationScore: Float,
-    val accuracyScore: Float
+    val presentationScores: List<Float>,
+    val accuracyScores: List<Float>
 )

@@ -4,11 +4,14 @@ import android.app.Application
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
+import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.PresentationScore
+import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.StandardPresentationViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -29,50 +32,78 @@ class FreestyleScoreViewModel @Inject constructor(
         )
 
         const val SCORES_KEY = "scores"
-        const val FIRST_STANCE_KEY = "firstStance"
-        const val SECOND_STANCE_KEY = "secondStance"
-        const val THIRD_STANCE_KEY = "thirdStance"
     }
 
-    val scores = savedStateHandle.getStateFlow(SCORES_KEY, List(10) { values.lastIndex })
-    val firstStance = savedStateHandle.getStateFlow(FIRST_STANCE_KEY, false)
-    val secondStance = savedStateHandle.getStateFlow(SECOND_STANCE_KEY, false)
-    val thirdStance = savedStateHandle.getStateFlow(THIRD_STANCE_KEY, false)
+    val scores = savedStateHandle.getStateFlow(
+        SCORES_KEY,
+        List(
+            savedStateHandle.get<Int>(
+                Route.FreestyleScore::count.name
+            ) ?: 1
+        ) {
+            FreestyleScore(
+                scores = List(10) {
+                    1f
+                },
+                firstStance = false,
+                secondStance = false,
+                thirdStance = false
+            )
+        })
 
-    fun setScoreIndex(index: Int, scoreIndex: Int) {
-        val newScores = scores.value.toMutableList()
-        newScores[index] = scoreIndex
-        savedStateHandle[SCORES_KEY] = newScores
+    fun setValue(index: Int, score: FreestyleScore) {
+        val map = scores.value.toMutableList()
+        map[index] = score
+        savedStateHandle[SCORES_KEY] = map
     }
 
-    fun setFirstStance(stance: Boolean) {
-        savedStateHandle[FIRST_STANCE_KEY] = stance
+    fun setScoreIndex(index: Int, scoreIndex: Int, score: Float) {
+        val newScores = scores.value[index]
+        val list = newScores.scores.toMutableList()
+        list[scoreIndex] = score
+        savedStateHandle[SCORES_KEY] = newScores.copy(
+            scores = list
+        )
     }
 
-    fun setSecondStance(stance: Boolean) {
-        savedStateHandle[SECOND_STANCE_KEY] = stance
+    fun setFirstStance(index: Int, stance: Boolean) {
+        val newScores = scores.value[index]
+        savedStateHandle[SCORES_KEY] = newScores.copy(
+            firstStance = stance
+        )
     }
 
-    fun setThirdStance(stance: Boolean) {
-        savedStateHandle[THIRD_STANCE_KEY] = stance
+    fun setSecondStance(index: Int, stance: Boolean) {
+        val newScores = scores.value[index]
+        savedStateHandle[SCORES_KEY] = newScores.copy(
+            secondStance = stance
+        )
     }
 
-    fun calculateTechnique(): Float {
+    fun setThirdStance(index: Int, stance: Boolean) {
+        val newScores = scores.value[index]
+        savedStateHandle[SCORES_KEY] = newScores.copy(
+            thirdStance = stance
+        )
+    }
+
+    fun calculateTechnique(index: Int): Float {
         // technique score is given by first give values
-        return scores.value.take(5).map { values[it] }.sum()
+        return scores.value[index].scores.take(5).sum()
     }
 
-    fun calculatePresentation(): Float {
-        return scores.value.map { values[it] }.sum() - calculateTechnique()
+    fun calculatePresentation(index: Int): Float {
+        return scores.value[index].scores.sum() - calculateTechnique(index)
     }
 
-    fun calculateStanceDecrease(): Float {
+    fun calculateStanceDecrease(index: Int): Float {
+        val score = scores.value[index]
         var decrease = 0f
-        if (!firstStance.value)
+        if (!score.firstStance)
             decrease += 0.3f
-        if (!secondStance.value)
+        if (!score.secondStance)
             decrease += 0.3f
-        if (!thirdStance.value)
+        if (!score.thirdStance)
             decrease += 0.3f
         return decrease
     }
@@ -91,14 +122,16 @@ class FreestyleScoreViewModel @Inject constructor(
                 displayRequestFailure(application)
                 return@launch
             }
-            val presentationScore = calculatePresentation()
-            val accuracyScore = calculateTechnique()
             val result = remoteRepository.sendScore(
                 ScoreData(
                     judgeId = judgeId.toShort(),
                     tableId = tableId.toShort(),
-                    presentationScore = presentationScore,
-                    accuracyScore = accuracyScore
+                    presentationScores = List(scores.value.size) { index ->
+                        calculatePresentation(
+                            index
+                        )
+                    },
+                    accuracyScores = List(scores.value.size) { index -> calculateTechnique(index) }
                 )
             )
             if (result.isFailure) displayRequestFailure(application)

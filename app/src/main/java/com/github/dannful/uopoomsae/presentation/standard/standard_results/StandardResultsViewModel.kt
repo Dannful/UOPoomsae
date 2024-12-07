@@ -6,11 +6,11 @@ import com.github.dannful.uopoomsae.core.Route
 import javax.inject.Inject
 
 class StandardResultsViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     val techniqueScore =
-        savedStateHandle.get<Float>(Route.StandardResults.arguments[0].toString()) ?: 0f
+        savedStateHandle.get<FloatArray>(Route.StandardResults::techniqueScores.name)!!
     val presentationScore =
-        savedStateHandle.get<Float>(Route.StandardResults.arguments[1].toString()) ?: 0f
+        savedStateHandle.get<FloatArray>(Route.StandardResults::presentationScores.name)!!
 }
