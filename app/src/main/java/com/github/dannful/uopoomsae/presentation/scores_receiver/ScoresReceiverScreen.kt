@@ -1,5 +1,7 @@
 package com.github.dannful.uopoomsae.presentation.scores_receiver
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +34,7 @@ import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
+import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 private const val CIRCLE_RADIUS = 10f
@@ -45,18 +48,17 @@ fun ScoresReceiverScreen(
         mutableStateOf(0)
     }
     PageHeader(bottomBar = {
-        val scoreBundles = scores[currentTab]
         Row(
             horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
             modifier = Modifier.padding(LocalSpacing.current.small)
         ) {
             Button(
-                onClick = scoresReceiverViewModel::resetScores,
+                onClick = { scoresReceiverViewModel.resetScores(currentTab) },
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
-                enabled = scoreBundles.any { it.presentationScore != 0f && it.techniqueScore != 0f }
+                enabled = scores.any { it[currentTab]?.techniqueScore != 0f || it[currentTab]?.presentationScore != 0f }
             ) {
                 Text(text = "ZERAR PLACAR")
             }
@@ -76,45 +78,48 @@ fun ScoresReceiverScreen(
             }
         }
     }) {
-        TabRow(selectedTabIndex = currentTab) {
-            scores.forEachIndexed { index, scoreBundles ->
+        TabRow(selectedTabIndex = currentTab, tabs = {
+            (0..(scores.minOfOrNull { it.size } ?: 0)).forEach { index ->
                 Tab(selected = currentTab == index, onClick = {
                     currentTab = index
-                }) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        item {
-                            Row {
-                                Spacer(modifier = Modifier.weight(1f))
-                                TableHead(text = "PRECISÃO")
-                                TableHead(text = "APRESENTAÇÃO")
-                            }
-                        }
-                        item {
-                            HorizontalDivider()
-                        }
-                        items(ScoresReceiverViewModel.JUDGE_COUNT, key = { it }) {
-                            val judge = it + 1
-                            val recentlyChanged = scoresReceiverViewModel.changes.contains(it)
-                            Row {
-                                TableHead(
-                                    text = "ÁRBITRO $judge",
-                                    recentlyChanged = recentlyChanged
-                                )
-                                TableBody(
-                                    text = formatDecimal(scoreBundles[it].techniqueScore),
-                                    color = MaterialTheme.colorScheme.onError
-                                )
-                                TableBody(
-                                    text = formatDecimal(scoreBundles[it].presentationScore),
-                                    color = MaterialTheme.colorScheme.primaryContainer
-                                )
-                            }
-                            HorizontalDivider()
-                        }
-                    }
+                }, text = {
+                    Text(text = "ATLETA $index")
+                })
+            }
+        })
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            item {
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TableHead(text = "PRECISÃO")
+                    TableHead(text = "APRESENTAÇÃO")
                 }
+            }
+            item {
+                HorizontalDivider()
+            }
+            items(ScoresReceiverViewModel.JUDGE_COUNT, key = { it }) {
+                val judge = it + 1
+                val recentlyChanged = scoresReceiverViewModel.changes.contains(judge to currentTab)
+                val scoreBundles = scores[it]
+                val score = scoreBundles.getOrElse(currentTab) { ScoreBundle(0f, 0f) }
+                Row {
+                    TableHead(
+                        text = "ÁRBITRO $judge",
+                        recentlyChanged = recentlyChanged
+                    )
+                    TableBody(
+                        text = formatDecimal(score.techniqueScore),
+                        color = MaterialTheme.colorScheme.onError
+                    )
+                    TableBody(
+                        text = formatDecimal(score.presentationScore),
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                }
+                HorizontalDivider()
             }
         }
     }

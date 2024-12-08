@@ -209,10 +209,10 @@ fun Receive(
 }
 
 fun NavGraphBuilder.modeSelectScreen(navController: NavController) {
-    composable(Route.ModeSelect.toString()) {
+    composable<Route.ModeSelect> {
         ModeSelectScreen(
-            onSend = { navController.navigate(Route.CompetitionType.toString()) },
-            onReceive = { navController.navigate(Route.ScoresReceiver.toString()) }
+            onSend = { navController.navigate(Route.CompetitionType) },
+            onReceive = { navController.navigate(Route.ScoresReceiver) }
         )
     }
 }

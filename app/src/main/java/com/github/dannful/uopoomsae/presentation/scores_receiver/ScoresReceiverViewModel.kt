@@ -37,15 +37,15 @@ class ScoresReceiverViewModel @Inject constructor(
     val scores =
         savedStateHandle.getStateFlow(
             SCORES_KEY,
-            listOf(List(JUDGE_COUNT) { ScoreBundle(0f, 0f) })
+            List(JUDGE_COUNT) { mapOf(0 to ScoreBundle(0f, 0f)) }
         )
 
     val lastFetch = savedStateHandle.getStateFlow(FETCH_COOLDOWN_KEY, 0)
     val isCompetitionMode = preferencesRepository.getCompetitionMode()
-    val changes = mutableStateListOf<Int>()
+    val changes = mutableStateListOf<Pair<Int, Int>>()
 
     init {
-        resetScores()
+        resetScores(scores.value.minOf { it.size })
         fetchScores()
     }
 
@@ -60,8 +60,8 @@ class ScoresReceiverViewModel @Inject constructor(
         }
     }
 
-    private fun addRecentUpdate(judgeId: Int) {
-        changes.add(judgeId)
+    private fun addRecentUpdate(athleteId: Int, judgeId: Int) {
+        changes.add(judgeId to athleteId)
     }
 
     fun fetchScores() {
@@ -82,12 +82,12 @@ class ScoresReceiverViewModel @Inject constructor(
             result.getOrThrow().forEach { scoreData ->
                 setScore(
                     scoreData.judgeId - 1,
-                    scoreData.accuracyScores.mapIndexed { index, value ->
-                        ScoreBundle(
+                    mapOf(*scoreData.accuracyScores.mapIndexed { index, value ->
+                        index to ScoreBundle(
                             techniqueScore = value,
                             presentationScore = scoreData.presentationScores[index]
                         )
-                    }
+                    }.toTypedArray())
                 )
             }
             savedStateHandle[FETCH_COOLDOWN_KEY] = FETCH_COOLDOWN_SECONDS
@@ -95,15 +95,24 @@ class ScoresReceiverViewModel @Inject constructor(
         }
     }
 
-    private fun setScore(judgeIndex: Int, score: List<ScoreBundle>) {
+    private fun setScore(judgeIndex: Int, score: Map<Int, ScoreBundle>) {
         val newScores = scores.value.toMutableList()
         newScores[judgeIndex] = score
         savedStateHandle[SCORES_KEY] = newScores
-        addRecentUpdate(judgeIndex)
+        for (i in score.keys)
+            addRecentUpdate(judgeIndex, i)
     }
 
-    fun resetScores() {
-        savedStateHandle[SCORES_KEY] = listOf(List(JUDGE_COUNT) { ScoreBundle(0f, 0f) })
-        changes.clear()
+    fun resetScores(index: Int) {
+        val newList = scores.value.toMutableList()
+        for (i in newList.indices) {
+            val scoresMutable = newList[i].toMutableMap()
+            if (scoresMutable.size <= index)
+                continue
+            scoresMutable[index] = ScoreBundle(0f, 0f)
+            newList[i] = scoresMutable
+        }
+        savedStateHandle[SCORES_KEY] = newList
+        changes.removeIf { it.second == index }
     }
 }
