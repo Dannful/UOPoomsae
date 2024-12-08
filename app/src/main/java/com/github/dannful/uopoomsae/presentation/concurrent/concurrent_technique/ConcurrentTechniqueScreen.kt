@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
@@ -31,6 +32,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -57,38 +59,39 @@ fun ConcurrentTechniqueScreen(
             onSend(if (reversed) scores.reversedArray() else scores, reversed)
         }
     }) {
-        Column(verticalArrangement = Arrangement.spacedBy(spacing.small)) {
-            Switch(checked = reversed, onCheckedChange = {
-                reversed = it
-            }, modifier = Modifier.weight(1f))
-            Box(
-                modifier = Modifier
-                    .weight(5f)
-                    .fillMaxSize()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Switch(checked = reversed, onCheckedChange = {
+                    reversed = it
+                })
                 VerticalDivider(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxHeight()
+                        .weight(1f)
                 )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(
-                        spacing.medium,
-                        Alignment.CenterHorizontally
-                    ),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    ScoreSet(reversed = reversed, left = true, score = scores[0], updateScore = {
-                        concurrentTechniqueViewModel.setScore(
-                            firstScore = it
-                        )
-                    })
-                    ScoreSet(reversed = reversed, left = false, score = scores[1], updateScore = {
-                        concurrentTechniqueViewModel.setScore(
-                            secondScore = it
-                        )
-                    })
-                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(
+                    spacing.medium,
+                    Alignment.CenterHorizontally
+                ),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                ScoreSet(reversed = reversed, left = true, score = scores[0], updateScore = {
+                    concurrentTechniqueViewModel.setScore(
+                        firstScore = it
+                    )
+                })
+                ScoreSet(reversed = reversed, left = false, score = scores[1], updateScore = {
+                    concurrentTechniqueViewModel.setScore(
+                        secondScore = it
+                    )
+                })
             }
         }
     }
@@ -115,104 +118,110 @@ private fun RowScope.ScoreSet(
         targetValue = colors[colorIndex],
         label = "buttonColor"
     )
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(spacing.small),
-        modifier = Modifier.Companion
-            .weight(1f)
-            .fillMaxSize()
+    Row(
+        modifier = Modifier.weight(1f),
+        horizontalArrangement = Arrangement.spacedBy(spacing.small)
     ) {
-        val arrow = @Composable {
-            Image(
-                painter = painterResource(id = getArrow(colorIndex, left)),
-                modifier = Modifier
-                    .weight(1f)
+        val firstBlock = @Composable {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(spacing.small),
+                modifier = Modifier.Companion
+                    .weight(2f)
                     .fillMaxSize()
-                    .padding(spacing.medium),
-                contentDescription = null,
-                alignment = Alignment.Center,
-                contentScale = ContentScale.Inside
-            )
-        }
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            val text =
-                @Composable {
-                    Text(
-                        text = formatDecimal(score), textAlign = TextAlign.Center,
-                        modifier = Modifier.weight(1f),
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                }
-            val button = @Composable {
-                ScoreButton(
-                    color = colorAnimation,
-                    shape = MaterialTheme.shapes.medium,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxSize(),
-                    value = -0.3f
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                    modifier = Modifier.weight(1f),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    updateScore(score - 0.3f)
-                }
-            }
-            if (left) {
-                button()
-                text()
-                arrow()
-            } else {
-                arrow()
-                text()
-                button()
-            }
-        }
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            modifier = Modifier
-                .weight(2f)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.Bottom
-        ) {
-            val inc = @Composable {
-                Column(modifier = Modifier.weight(1f)) {
-                    arrow()
-                    ScoreButton(
-                        color = colorAnimation,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier
-                            .weight(1f)
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.5f),
-                        value = 0.1f
-                    ) {
-                        updateScore(score + 0.1f)
+                    val text =
+                        @Composable {
+                            Text(
+                                text = formatDecimal(score), textAlign = TextAlign.Center,
+                                modifier = Modifier.weight(1f),
+                                style = MaterialTheme.typography.displaySmall
+                            )
+                        }
+                    val button = @Composable {
+                        ScoreButton(
+                            color = colorAnimation,
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxSize(),
+                            value = -0.3f
+                        ) {
+                            updateScore(score - 0.3f)
+                        }
+                    }
+                    if (left) {
+                        button()
+                        text()
+                    } else {
+                        text()
+                        button()
                     }
                 }
-            }
-            val dec = @Composable {
                 ScoreButton(
                     color = colorAnimation,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
-                        .weight(2f)
+                        .weight(1.5f)
                         .fillMaxSize(),
                     value = -0.1f,
                 ) {
                     updateScore(score - 0.1f)
                 }
             }
-            if (left) {
-                dec()
-                inc()
-            } else {
-                inc()
-                dec()
+        }
+        val arrowBlock = @Composable {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(spacing.small),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+            ) {
+                Image(
+                    painter = painterResource(id = getArrow(colorIndex, left)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .padding(spacing.large),
+                    contentDescription = null,
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Inside
+                )
+                Image(
+                    painter = painterResource(id = getArrow(colorIndex, left)),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
+                        .padding(spacing.large),
+                    contentDescription = null,
+                    alignment = Alignment.Center,
+                    contentScale = ContentScale.Inside
+                )
+                ScoreButton(
+                    color = colorAnimation,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.5f),
+                    value = 0.1f
+                ) {
+                    updateScore(score + 0.1f)
+                }
             }
+        }
+        if (left) {
+            firstBlock()
+            arrowBlock()
+        } else {
+            arrowBlock()
+            firstBlock()
         }
     }
 }

@@ -23,8 +23,8 @@ class ConcurrentTechniqueViewModel @Inject constructor(
 
     fun setScore(firstScore: Float? = null, secondScore: Float? = null) {
         savedStateHandle[TECHNIQUE_SCORE_KEY] = floatArrayOf(
-            firstScore ?: techniqueScore.value[0],
-            secondScore ?: techniqueScore.value[1]
+            firstScore?.coerceIn(0f..4f) ?: techniqueScore.value[0],
+            secondScore?.coerceIn(0f..4f) ?: techniqueScore.value[1]
         )
     }
 }

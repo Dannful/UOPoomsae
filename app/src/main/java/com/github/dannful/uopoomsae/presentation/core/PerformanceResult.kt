@@ -27,12 +27,14 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun PerformanceResult(
     columnsPerRow: Int = 3,
-    values: Map<String, Float>
+    values: Map<String, Float>,
+    modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
         columns = GridCells.Fixed(columnsPerRow),
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
-        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+        modifier = modifier
     ) {
         items(values.keys.toList(), key = {
             it

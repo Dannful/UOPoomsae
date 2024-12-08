@@ -1,7 +1,11 @@
 package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_results
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +19,7 @@ import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.PerformanceResult
 import com.github.dannful.uopoomsae.presentation.standard.standard_results.StandardResultsScreen
 import com.github.dannful.uopoomsae.presentation.standard.standard_results.StandardResultsViewModel
+import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
 fun ConcurrentResultsScreen(
@@ -30,21 +35,31 @@ fun ConcurrentResultsScreen(
     }) {
         val techniqueScore = concurrentResultsViewModel.techniqueScore
         val presentationScore = concurrentResultsViewModel.presentationScore
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxSize(),
-            contentAlignment = Alignment.Center
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(
+                LocalSpacing.current.small,
+                alignment = Alignment.CenterHorizontally
+            )
         ) {
             PerformanceResult(
-                3,
+                2,
                 mapOf(
                     "PRECISÃO 1" to techniqueScore[0],
                     "APRESENTAÇÃO 1" to presentationScore[0],
-                    "NOTA FINAL 1" to techniqueScore[0] + presentationScore[0],
+                ),
+                modifier = Modifier.weight(1f)
+            )
+            VerticalDivider(modifier = Modifier.fillMaxHeight())
+            PerformanceResult(
+                2,
+                mapOf(
                     "PRECISÃO 2" to techniqueScore[1],
                     "APRESENTAÇÃO 2" to presentationScore[1],
-                    "NOTA FINAL 2" to techniqueScore[1] + presentationScore[1]
-                )
+                ),
+                modifier = Modifier.weight(1f)
             )
         }
     }

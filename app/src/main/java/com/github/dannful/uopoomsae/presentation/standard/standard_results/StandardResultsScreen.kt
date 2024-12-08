@@ -37,8 +37,7 @@ fun StandardResultsScreen(
                 2,
                 mapOf(
                     "PRECISÃO" to techniqueScore,
-                    "APRESENTAÇÃO" to presentationScore,
-                    "NOTA FINAL" to techniqueScore + presentationScore
+                    "APRESENTAÇÃO" to presentationScore
                 )
             )
         }
