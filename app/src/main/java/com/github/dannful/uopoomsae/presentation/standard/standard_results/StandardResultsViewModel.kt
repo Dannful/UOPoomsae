@@ -10,7 +10,7 @@ class StandardResultsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val techniqueScore =
-        savedStateHandle.get<FloatArray>(Route.StandardResults::techniqueScores.name)!!
+        savedStateHandle.get<Float>(Route.StandardResults::techniqueScore.name)!!
     val presentationScore =
-        savedStateHandle.get<FloatArray>(Route.StandardResults::presentationScores.name)!!
+        savedStateHandle.get<Float>(Route.StandardResults::presentationScore.name)!!
 }

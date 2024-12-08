@@ -20,6 +20,9 @@ import androidx.navigation.compose.rememberNavController
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.domain.repository.DispatcherProvider
 import com.github.dannful.uopoomsae.presentation.competition_type.competitionTypeRoute
+import com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation.concurrentPresentationScreen
+import com.github.dannful.uopoomsae.presentation.concurrent.concurrent_results.concurrentResultsRoute
+import com.github.dannful.uopoomsae.presentation.concurrent.concurrent_technique.concurrentTechniqueScreen
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_results.freestyleResultsRoute
 import com.github.dannful.uopoomsae.presentation.freestyle.freestyle_score.freestyleScoreRoute
 import com.github.dannful.uopoomsae.presentation.login_screen.loginRoute
@@ -72,9 +75,24 @@ class MainActivity : ComponentActivity() {
                         loginRoute(controller)
                         modeSelectScreen(controller)
                         competitionTypeRoute(controller)
-                        standardTechniqueScreen(controller)
-                        standardPresentationScreen(controller)
-                        standardResultsRoute(controller)
+                        standardTechniqueScreen(
+                            controller
+                        )
+                        standardPresentationScreen(
+                            controller
+                        )
+                        standardResultsRoute(
+                            controller
+                        )
+                        concurrentTechniqueScreen(
+                            controller
+                        )
+                        concurrentPresentationScreen(
+                            controller
+                        )
+                        concurrentResultsRoute(
+                            controller
+                        )
                         freestyleScoreRoute(controller)
                         freestyleResultsRoute(controller)
                         scoresReceiverRoute()

@@ -10,9 +10,9 @@ class FreestyleResultsViewModel @Inject constructor(
 ) : ViewModel() {
 
     val accuracyScore =
-        savedStateHandle.get<FloatArray>(Route.FreestyleResults::accuracy.name)!!
+        savedStateHandle.get<Float>(Route.FreestyleResults::accuracy.name)!!
     val presentationScore =
-        savedStateHandle.get<FloatArray>(Route.FreestyleResults::presentation.name)!!
+        savedStateHandle.get<Float>(Route.FreestyleResults::presentation.name)!!
     val stanceDecrease =
-        savedStateHandle.get<FloatArray>(Route.FreestyleResults::stanceDecrease.name)!!
+        savedStateHandle.get<Float>(Route.FreestyleResults::stanceDecrease.name)!!
 }

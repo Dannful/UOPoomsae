@@ -106,13 +106,13 @@ fun NavGraphBuilder.competitionTypeRoute(
     composable<Route.CompetitionType> {
         CompetitionTypeScreen(
             standardMode = {
-                controller.navigate(Route.StandardTechnique(count = 1))
+                controller.navigate(Route.StandardTechnique)
             },
             freestyleMode = {
-                controller.navigate(Route.FreestyleScore(count = 1))
+                controller.navigate(Route.FreestyleScore)
             },
             multipleMode = {
-                controller.navigate(Route.StandardTechnique(count = 2))
+                controller.navigate(Route.ConcurrentTechnique)
             },
             onBack = {
                 controller.navigate(it)

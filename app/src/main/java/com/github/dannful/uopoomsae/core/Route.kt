@@ -1,5 +1,6 @@
 package com.github.dannful.uopoomsae.core
 
+import com.github.dannful.uopoomsae.presentation.concurrent.core.ConcurrentScore
 import kotlinx.serialization.Serializable
 
 sealed class Route {
@@ -14,19 +15,32 @@ sealed class Route {
     data object CompetitionType : Route()
 
     @Serializable
-    data class StandardTechnique(
-        val count: Int
-    ) : Route()
+    data object StandardTechnique : Route()
 
     @Serializable
     data class StandardPresentation(
-        val techniqueScores: FloatArray
+        val techniqueScore: Float
+    ) : Route()
+
+    @Serializable
+    data class StandardResults(
+        val techniqueScore: Float,
+        val presentationScore: Float
+    ) : Route()
+
+    @Serializable
+    data object ConcurrentTechnique : Route()
+
+    @Serializable
+    data class ConcurrentPresentation(
+        val techniqueScores: FloatArray,
+        val reversed: Boolean
     ) : Route() {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as StandardPresentation
+            other as ConcurrentPresentation
 
             if (!techniqueScores.contentEquals(other.techniqueScores)) return false
 
@@ -39,7 +53,7 @@ sealed class Route {
     }
 
     @Serializable
-    data class StandardResults(
+    data class ConcurrentResults(
         val techniqueScores: FloatArray,
         val presentationScores: FloatArray
     ) : Route() {
@@ -47,7 +61,7 @@ sealed class Route {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
 
-            other as StandardResults
+            other as ConcurrentResults
 
             if (!techniqueScores.contentEquals(other.techniqueScores)) return false
             if (!presentationScores.contentEquals(other.presentationScores)) return false
@@ -63,36 +77,14 @@ sealed class Route {
     }
 
     @Serializable
-    data class FreestyleScore(
-        val count: Int
-    ) : Route()
+    data object FreestyleScore : Route()
 
     @Serializable
     data class FreestyleResults(
-        val accuracy: FloatArray,
-        val presentation: FloatArray,
-        val stanceDecrease: FloatArray
-    ) : Route() {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as FreestyleResults
-
-            if (!accuracy.contentEquals(other.accuracy)) return false
-            if (!presentation.contentEquals(other.presentation)) return false
-            if (!stanceDecrease.contentEquals(other.stanceDecrease)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = accuracy.contentHashCode()
-            result = 31 * result + presentation.contentHashCode()
-            result = 31 * result + stanceDecrease.contentHashCode()
-            return result
-        }
-    }
+        val accuracy: Float,
+        val presentation: Float,
+        val stanceDecrease: Float
+    ) : Route()
 
     @Serializable
     data object ScoresReceiver : Route()

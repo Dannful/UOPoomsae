@@ -1,4 +1,4 @@
-package com.github.dannful.uopoomsae.presentation.standard.standard_presentation
+package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation
 
 import android.app.Application
 import androidx.lifecycle.SavedStateHandle
@@ -9,7 +9,7 @@ import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
-import com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation.PresentationScore
+import com.github.dannful.uopoomsae.presentation.concurrent.core.ConcurrentScore
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StandardPresentationViewModel @Inject constructor(
+class ConcurrentPresentationViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val remoteRepository: RemoteRepository,
     private val preferencesRepository: PreferencesRepository,
@@ -50,31 +50,24 @@ class StandardPresentationViewModel @Inject constructor(
         )
     }
 
-    val previousScore =
-        savedStateHandle.get<Float>(Route.StandardPresentation::techniqueScore.name)!!
-    val scores = savedStateHandle.getStateFlow(
-        SCORES_KEY,
+    val previousScores =
+        savedStateHandle.get<FloatArray>(Route.ConcurrentPresentation::techniqueScores.name)!!
+
+    val reversed = savedStateHandle.get<Boolean>(Route.ConcurrentPresentation::reversed.name) ?: false
+
+    val scores = savedStateHandle.getStateFlow(SCORES_KEY, List(2) {
         floatArrayOf(INITIAL_SCORE, INITIAL_SCORE, INITIAL_SCORE)
-    )
+    })
 
-    fun setValue(score: FloatArray) {
-        savedStateHandle[SCORES_KEY] = score
+    fun setValue(index: Int, speed: Float? = null, pace: Float? = null, power: Float? = null) {
+        val map = scores.value.toMutableList()
+        map[index] =
+            floatArrayOf(speed ?: map[index][0], pace ?: map[index][1], power ?: map[index][2])
+        savedStateHandle[SCORES_KEY] = map
     }
 
-    fun setSpeed(value: Float) {
-        setValue(floatArrayOf(value, scores.value[1], scores.value[2]))
-    }
-
-    fun setPace(value: Float) {
-        setValue(floatArrayOf(scores.value[0], value, scores.value[2]))
-    }
-
-    fun setPower(value: Float) {
-        setValue(floatArrayOf(scores.value[0], scores.value[1], value))
-    }
-
-    fun calculateScore(): Float {
-        val score = scores.value
+    fun calculateScore(index: Int): Float {
+        val score = scores.value[index]
         return score[0] + score[1] + score[2]
     }
 
@@ -96,8 +89,8 @@ class StandardPresentationViewModel @Inject constructor(
                 ScoreData(
                     tableId = tableId.toShort(),
                     judgeId = judgeId.toShort(),
-                    accuracyScores = listOf(previousScore),
-                    presentationScores = listOf(calculateScore())
+                    accuracyScores = previousScores.toList(),
+                    presentationScores = List(scores.value.size) { index -> calculateScore(index) }
                 )
             )
             if (result.isFailure)

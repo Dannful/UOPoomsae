@@ -1,4 +1,4 @@
-package com.github.dannful.uopoomsae.presentation.standard.standard_results
+package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_results
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,10 +13,12 @@ import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.presentation.core.FinishButtonGroup
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.PerformanceResult
+import com.github.dannful.uopoomsae.presentation.standard.standard_results.StandardResultsScreen
+import com.github.dannful.uopoomsae.presentation.standard.standard_results.StandardResultsViewModel
 
 @Composable
-fun StandardResultsScreen(
-    standardResultsViewModel: StandardResultsViewModel = viewModel(),
+fun ConcurrentResultsScreen(
+    concurrentResultsViewModel: ConcurrentResultsViewModel = viewModel(),
     onSelectMode: () -> Unit,
     onFinish: () -> Unit
 ) {
@@ -26,33 +28,36 @@ fun StandardResultsScreen(
             onFinish = onFinish
         )
     }) {
-        val techniqueScore = standardResultsViewModel.techniqueScore
-        val presentationScore = standardResultsViewModel.presentationScore
+        val techniqueScore = concurrentResultsViewModel.techniqueScore
+        val presentationScore = concurrentResultsViewModel.presentationScore
         Box(
             modifier = Modifier
                 .fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             PerformanceResult(
-                2,
+                3,
                 mapOf(
-                    "PRECISÃO" to techniqueScore,
-                    "APRESENTAÇÃO" to presentationScore,
-                    "NOTA FINAL" to techniqueScore + presentationScore
+                    "PRECISÃO 1" to techniqueScore[0],
+                    "APRESENTAÇÃO 1" to presentationScore[0],
+                    "NOTA FINAL 1" to techniqueScore[0] + presentationScore[0],
+                    "PRECISÃO 2" to techniqueScore[1],
+                    "APRESENTAÇÃO 2" to presentationScore[1],
+                    "NOTA FINAL 2" to techniqueScore[1] + presentationScore[1]
                 )
             )
         }
     }
 }
 
-fun NavGraphBuilder.standardResultsRoute(
+fun NavGraphBuilder.concurrentResultsRoute(
     controller: NavController
 ) {
-    composable<Route.StandardResults> {
-        StandardResultsScreen(onSelectMode = {
+    composable<Route.ConcurrentResults> {
+        ConcurrentResultsScreen(onSelectMode = {
             controller.navigate(Route.CompetitionType)
         }, onFinish = {
-            controller.navigate(Route.StandardTechnique)
+            controller.navigate(Route.ConcurrentTechnique)
         })
     }
 }

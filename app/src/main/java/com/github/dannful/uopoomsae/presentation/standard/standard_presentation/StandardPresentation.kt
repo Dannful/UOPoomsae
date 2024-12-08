@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
@@ -23,9 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
@@ -33,87 +30,64 @@ import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun StandardPresentationScreen(
     standardPresentationViewModel: StandardPresentationViewModel = hiltViewModel(),
-    onSend: (List<ScoreBundle>) -> Unit
+    onSend: (ScoreBundle) -> Unit
 ) {
     val spacing = LocalSpacing.current
     val scores by standardPresentationViewModel.scores.collectAsState()
     PageHeader(bottomBar = {
         SendButton {
             standardPresentationViewModel.send()
-            onSend(List(scores.size) { index ->
+            onSend(
                 ScoreBundle(
-                    presentationScore = standardPresentationViewModel.calculateScore(index),
-                    techniqueScore = standardPresentationViewModel.previousScores[index]
+                    techniqueScore = standardPresentationViewModel.previousScore,
+                    presentationScore = standardPresentationViewModel.calculateScore()
                 )
-            })
+            )
         }
     }) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            if (scores.size > 1)
-                VerticalDivider(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxHeight()
-                )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacing.medium,
-                    alignment = Alignment.CenterHorizontally
-                ),
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                items(scores.size, key = { it }) { index ->
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(spacing.small),
-                        modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp / (scores.size * 1.1f))
-                    ) {
-                        val speed = scores[index].speed
-                        val pace = scores[index].pace
-                        val power = scores[index].power
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "VELOCIDADE E POTÊNCIA",
-                            isSelected = {
-                                speed == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            standardPresentationViewModel.setSpeed(
-                                index,
-                                StandardPresentationViewModel.values[it]
-                            )
-                        }
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "RITMO E TEMPO",
-                            isSelected = {
-                                pace == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            standardPresentationViewModel.setPace(
-                                index,
-                                StandardPresentationViewModel.values[it]
-                            )
-                        }
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "EXPRESSÃO DE ENERGIA",
-                            isSelected = {
-                                power == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            standardPresentationViewModel.setPower(
-                                index,
-                                StandardPresentationViewModel.values[it]
-                            )
-                        }
-                    }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
+            modifier = Modifier.fillMaxSize()
+        ) {
+            val speed = scores[0]
+            val pace = scores[1]
+            val power = scores[2]
+            NamedGradient(
+                values = StandardPresentationViewModel.values.map { it.toString() },
+                name = "VELOCIDADE E POTÊNCIA",
+                isSelected = {
+                    speed == StandardPresentationViewModel.values[it]
                 }
+            ) {
+                standardPresentationViewModel.setSpeed(
+                    StandardPresentationViewModel.values[it]
+                )
+            }
+            NamedGradient(
+                values = StandardPresentationViewModel.values.map { it.toString() },
+                name = "RITMO E TEMPO",
+                isSelected = {
+                    pace == StandardPresentationViewModel.values[it]
+                }
+            ) {
+                standardPresentationViewModel.setPace(
+                    StandardPresentationViewModel.values[it]
+                )
+            }
+            NamedGradient(
+                values = StandardPresentationViewModel.values.map { it.toString() },
+                name = "EXPRESSÃO DE ENERGIA",
+                isSelected = {
+                    power == StandardPresentationViewModel.values[it]
+                }
+            ) {
+                standardPresentationViewModel.setPower(
+                    StandardPresentationViewModel.values[it]
+                )
             }
         }
     }
@@ -150,9 +124,8 @@ fun NavGraphBuilder.standardPresentationScreen(
         StandardPresentationScreen {
             controller.navigate(
                 Route.StandardResults(
-                    techniqueScores = it.map { bundle -> bundle.techniqueScore }.toFloatArray(),
-                    presentationScores = it.map { bundle -> bundle.presentationScore }
-                        .toFloatArray()
+                    techniqueScore = it.techniqueScore,
+                    presentationScore = it.presentationScore
                 )
             )
         }

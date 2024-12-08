@@ -42,18 +42,18 @@ class RemoteRepositoryImpl(
     }
 
     override suspend fun getUserAuth(): Permissions {
-        try {
+        return try {
             val request = networkClient.get(Auth.Current())
-            return request.body()
+            request.body()
         } catch (e: Exception) {
-            return Permissions.NONE
+            Permissions.NONE
         }
     }
 
     override suspend fun getScores(tableId: Short): Result<List<ScoreData>> {
         return try {
             val request = networkClient.get(Scores.TableId(tableId = tableId))
-            Result.success(request.body<List<ScoreData>>())
+            Result.success(request.body())
         } catch (e: Exception) {
             Result.failure(e)
         }

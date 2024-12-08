@@ -4,14 +4,11 @@ import android.app.Application
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.domain.model.Permissions
 import com.github.dannful.uopoomsae.domain.model.ScoreData
 import com.github.dannful.uopoomsae.domain.repository.PreferencesRepository
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import com.github.dannful.uopoomsae.presentation.core.displayRequestFailure
-import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.PresentationScore
-import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.StandardPresentationViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -36,68 +33,61 @@ class FreestyleScoreViewModel @Inject constructor(
 
     val scores = savedStateHandle.getStateFlow(
         SCORES_KEY,
-        List(
-            savedStateHandle.get<Int>(
-                Route.FreestyleScore::count.name
-            ) ?: 1
-        ) {
-            FreestyleScore(
-                scores = List(10) {
-                    1f
-                },
-                firstStance = false,
-                secondStance = false,
-                thirdStance = false
-            )
-        })
+        FreestyleScore(
+            score = List(10) {
+                1f
+            },
+            firstStance = false,
+            secondStance = false,
+            thirdStance = false
+        )
+    )
 
-    fun setValue(index: Int, score: FreestyleScore) {
-        val map = scores.value.toMutableList()
-        map[index] = score
-        savedStateHandle[SCORES_KEY] = map
+    fun setValue(score: FreestyleScore) {
+        savedStateHandle[SCORES_KEY] = score
     }
 
-    fun setScoreIndex(index: Int, scoreIndex: Int, score: Float) {
-        val newScores = scores.value[index]
-        val list = newScores.scores.toMutableList()
+    fun setScoreIndex(scoreIndex: Int, score: Float) {
+        val newScores = scores.value
+        val list = newScores.score.toMutableList()
         list[scoreIndex] = score
         savedStateHandle[SCORES_KEY] = newScores.copy(
-            scores = list
+            score = list
         )
     }
 
-    fun setFirstStance(index: Int, stance: Boolean) {
-        val newScores = scores.value[index]
+    fun setFirstStance(stance: Boolean) {
+        val newScores = scores.value
         savedStateHandle[SCORES_KEY] = newScores.copy(
             firstStance = stance
         )
     }
 
-    fun setSecondStance(index: Int, stance: Boolean) {
-        val newScores = scores.value[index]
+    fun setSecondStance(stance: Boolean) {
+        val newScores = scores.value
         savedStateHandle[SCORES_KEY] = newScores.copy(
             secondStance = stance
         )
     }
 
-    fun setThirdStance(index: Int, stance: Boolean) {
-        val newScores = scores.value[index]
+    fun setThirdStance(stance: Boolean) {
+        val newScores = scores.value
         savedStateHandle[SCORES_KEY] = newScores.copy(
             thirdStance = stance
         )
     }
 
-    fun calculateTechnique(index: Int): Float {
+    fun calculateTechnique(): Float {
         // technique score is given by first give values
-        return scores.value[index].scores.take(5).sum()
+        return scores.value.score.take(5).sum()
     }
 
-    fun calculatePresentation(index: Int): Float {
-        return scores.value[index].scores.sum() - calculateTechnique(index)
+    fun calculatePresentation(): Float {
+        return scores.value.score.sum() - calculateTechnique()
     }
 
-    fun calculateStanceDecrease(index: Int): Float {
-        val score = scores.value[index]
+    fun calculateStanceDecrease(): Float {
+        val score = scores.value
         var decrease = 0f
         if (!score.firstStance)
             decrease += 0.3f
@@ -126,12 +116,8 @@ class FreestyleScoreViewModel @Inject constructor(
                 ScoreData(
                     judgeId = judgeId.toShort(),
                     tableId = tableId.toShort(),
-                    presentationScores = List(scores.value.size) { index ->
-                        calculatePresentation(
-                            index
-                        )
-                    },
-                    accuracyScores = List(scores.value.size) { index -> calculateTechnique(index) }
+                    presentationScores = listOf(calculatePresentation()),
+                    accuracyScores = listOf(calculateTechnique())
                 )
             )
             if (result.isFailure) displayRequestFailure(application)

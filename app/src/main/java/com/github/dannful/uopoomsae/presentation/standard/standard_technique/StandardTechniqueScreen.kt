@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
@@ -13,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -37,107 +37,81 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun StandardTechniqueScreen(
     standardTechniqueViewModel: StandardTechniqueViewModel = viewModel(),
-    onSend: (List<Float>) -> Unit
+    onSend: (Float) -> Unit
 ) {
-    val scores by standardTechniqueViewModel.techniqueScore.collectAsState()
+    val score by standardTechniqueViewModel.techniqueScore.collectAsState()
     val spacing = LocalSpacing.current
     PageHeader(bottomBar = {
         SendButton {
-            onSend(scores)
+            onSend(score)
         }
     }) {
-        Box(
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
             modifier = Modifier.fillMaxSize()
         ) {
-            if (scores.size > 1)
-                VerticalDivider(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxHeight()
-                )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacing.medium,
-                    Alignment.CenterHorizontally
-                ),
-                modifier = Modifier.align(Alignment.Center)
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(scores.size, key = { it }) { index ->
-                    val score = scores[index]
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(spacing.small),
-                        modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp / (scores.size * 1.1f))
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ScoreButton(
-                                color = MaterialTheme.colorScheme.errorContainer,
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier.weight(1f),
-                                value = 0.3f
-                            ) {
-                                standardTechniqueViewModel.setScore(index, score + 0.3f)
-                            }
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                fontSize = MaterialTheme.typography.bodyLarge.fontSize / (scores.size * 0.75),
-                                text = "NOTA PRECISÃO",
-                                textAlign = TextAlign.Center
-                            )
-                            ScoreButton(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier.weight(1f),
-                                value = 0.1f
-                            ) {
-                                standardTechniqueViewModel.setScore(index, score + 0.1f)
-                            }
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier
-                                .weight(3f)
-                                .fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ScoreButton(
-                                color = MaterialTheme.colorScheme.errorContainer,
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight(),
-                                value = -0.3f,
-                            ) {
-                                standardTechniqueViewModel.setScore(index, score - 0.3f)
-                            }
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = formatDecimal(score),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.displayLarge.copy(
-                                    fontSize = MaterialTheme.typography.displayLarge.fontSize.times(
-                                        2 / scores.size
-                                    )
-                                )
-                            )
-                            ScoreButton(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = MaterialTheme.shapes.medium,
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight(),
-                                value = -0.1f
-                            ) {
-                                standardTechniqueViewModel.setScore(index, score - 0.1f)
-                            }
-                        }
-                    }
+                ScoreButton(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.weight(1f),
+                    value = 0.3f
+                ) {
+                    standardTechniqueViewModel.setScore(score + 0.3f)
+                }
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = "NOTA PRECISÃO",
+                    textAlign = TextAlign.Center
+                )
+                ScoreButton(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.weight(1f),
+                    value = 0.1f
+                ) {
+                    standardTechniqueViewModel.setScore(score + 0.1f)
+                }
+            }
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .weight(3f)
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ScoreButton(
+                    color = MaterialTheme.colorScheme.errorContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    value = -0.3f,
+                ) {
+                    standardTechniqueViewModel.setScore(score - 0.3f)
+                }
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = formatDecimal(score),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.displayLarge
+                )
+                ScoreButton(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    value = -0.1f
+                ) {
+                    standardTechniqueViewModel.setScore(score - 0.1f)
                 }
             }
         }
@@ -170,7 +144,7 @@ fun NavGraphBuilder.standardTechniqueScreen(
         StandardTechniqueScreen {
             controller.navigate(
                 Route.StandardPresentation(
-                    techniqueScores = it.toFloatArray()
+                    techniqueScore = it
                 )
             )
         }

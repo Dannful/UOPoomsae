@@ -23,19 +23,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.FreestyleScores
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.SendButton
-import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.standardPresentationScreen
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun FreestyleScoreScreen(
@@ -49,68 +44,43 @@ fun FreestyleScoreScreen(
             freestyleScoreViewModel.send()
             onSend(
                 FreestyleScores(
-                    presentation = List(scores.size) { index ->
-                        freestyleScoreViewModel.calculatePresentation(
-                            index
-                        )
-                    },
-                    accuracy = List(scores.size) { index ->
-                        freestyleScoreViewModel.calculateTechnique(
-                            index
-                        )
-                    },
-                    stanceDecrease = List(scores.size) { index ->
-                        freestyleScoreViewModel.calculateStanceDecrease(
-                            index
-                        )
-                    }
+                    presentation = freestyleScoreViewModel.calculatePresentation(),
+                    accuracy = freestyleScoreViewModel.calculateTechnique(),
+                    stanceDecrease = freestyleScoreViewModel.calculateStanceDecrease()
                 )
             )
         }
     }) {
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(
-                spacing.small,
-                alignment = Alignment.CenterHorizontally
-            ),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
         ) {
-            items(scores.size) { scoreIndex ->
-                Column(
-                    modifier = Modifier
-                        .width(LocalConfiguration.current.screenWidthDp.dp / (scores.size * 1.1f))
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    val score = scores[scoreIndex]
-                    listOf(
-                        "LATERAL SALTANDO",
-                        "FRONTAL SEQUENCIAL SALTANDO",
-                        "GRADIENTE SALTANDO",
-                        "CONSECUTIVO DE KYORUGI",
-                        "ACROBACIA",
-                        "MOVIMENTOS PRÁTICOS",
-                        "CRIATIVIDADE",
-                        "HARMONIA",
-                        "EXPRESSÃO DE ENERGIA",
-                        "MÚSICA E COREOGRAFIA"
-                    ).forEachIndexed { index, name ->
-                        NamedButtonGradient(name = name, isSelected = {
-                            score.scores[index] == FreestyleScoreViewModel.values[it]
-                        }) {
-                            freestyleScoreViewModel.setScoreIndex(
-                                scoreIndex,
-                                index,
-                                FreestyleScoreViewModel.values[it]
-                            )
-                        }
-                    }
-                    CheckGroup(
-                        modifier = Modifier.align(Alignment.CenterHorizontally),
-                        freestyleScoreViewModel = freestyleScoreViewModel,
-                        index = scoreIndex
+            listOf(
+                "LATERAL SALTANDO",
+                "FRONTAL SEQUENCIAL SALTANDO",
+                "GRADIENTE SALTANDO",
+                "CONSECUTIVO DE KYORUGI",
+                "ACROBACIA",
+                "MOVIMENTOS PRÁTICOS",
+                "CRIATIVIDADE",
+                "HARMONIA",
+                "EXPRESSÃO DE ENERGIA",
+                "MÚSICA E COREOGRAFIA"
+            ).forEachIndexed { index, name ->
+                NamedButtonGradient(name = name, isSelected = {
+                    scores.score[index] == FreestyleScoreViewModel.values[it]
+                }) {
+                    freestyleScoreViewModel.setScoreIndex(
+                        index,
+                        FreestyleScoreViewModel.values[it]
                     )
                 }
             }
+            CheckGroup(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                freestyleScoreViewModel = freestyleScoreViewModel,
+            )
         }
     }
 }
@@ -147,7 +117,6 @@ private fun NamedButtonGradient(
 @Composable
 fun CheckGroup(
     modifier: Modifier = Modifier,
-    index: Int,
     freestyleScoreViewModel: FreestyleScoreViewModel
 ) {
     Row(
@@ -156,26 +125,26 @@ fun CheckGroup(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val scores by freestyleScoreViewModel.scores.collectAsState()
-        val firstStance = scores[index].firstStance
-        val secondStance = scores[index].secondStance
-        val thirdStance = scores[index].thirdStance
+        val firstStance = scores.firstStance
+        val secondStance = scores.secondStance
+        val thirdStance = scores.thirdStance
         NamedCheckbox(
             text = "HAKDARI SEOGI",
             isChecked = firstStance
         ) {
-            freestyleScoreViewModel.setFirstStance(index, it)
+            freestyleScoreViewModel.setFirstStance(it)
         }
         NamedCheckbox(
             text = "BEOM SEOGI",
             isChecked = secondStance
         ) {
-            freestyleScoreViewModel.setSecondStance(index, it)
+            freestyleScoreViewModel.setSecondStance(it)
         }
         NamedCheckbox(
             text = "DWIT KUBI SEOGI",
             isChecked = thirdStance
         ) {
-            freestyleScoreViewModel.setThirdStance(index, it)
+            freestyleScoreViewModel.setThirdStance(it)
         }
     }
 }
@@ -198,9 +167,9 @@ fun NavGraphBuilder.freestyleScoreRoute(
         FreestyleScoreScreen {
             controller.navigate(
                 Route.FreestyleResults(
-                    accuracy = it.accuracy.toFloatArray(),
-                    presentation = it.presentation.toFloatArray(),
-                    stanceDecrease = it.stanceDecrease.toFloatArray()
+                    accuracy = it.accuracy,
+                    presentation = it.presentation,
+                    stanceDecrease = it.stanceDecrease
                 )
             )
         }
