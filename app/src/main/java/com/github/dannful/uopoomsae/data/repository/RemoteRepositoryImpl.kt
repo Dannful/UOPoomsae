@@ -13,6 +13,7 @@ import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.resources.Resource
+import java.security.MessageDigest
 
 class RemoteRepositoryImpl(
     private val networkClient: HttpClient
@@ -71,11 +72,22 @@ class RemoteRepositoryImpl(
         }
     }
 
+    private fun hash(password: String): String {
+        val bytes = password.toByteArray()
+        val digestInstance = MessageDigest.getInstance("SHA-256")
+        val digest = digestInstance.digest(bytes)
+        return digest.fold("") { accumulator, byte -> accumulator + "%02x".format(byte) }
+    }
+
     override suspend fun login(userCredentials: UserCredentials): Result<Unit> {
         return try {
             networkClient.post(Auth.Login()) {
                 contentType(ContentType.Application.Json)
-                setBody(userCredentials)
+                setBody(
+                    userCredentials.copy(
+                        password = hash(userCredentials.password)
+                    )
+                )
             }
             Result.success(Unit)
         } catch (e: Exception) {
