@@ -1,7 +1,5 @@
 package com.github.dannful.uopoomsae.presentation.scores_receiver
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +17,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -46,6 +45,12 @@ fun ScoresReceiverScreen(
     val scores by scoresReceiverViewModel.scores.collectAsState()
     var currentTab by rememberSaveable {
         mutableStateOf(0)
+    }
+    LaunchedEffect(scores.maxOf { it.size }) {
+        val max = scores.maxOf { it.size } - 1
+        if (currentTab <= max)
+            return@LaunchedEffect
+        currentTab = max
     }
     PageHeader(bottomBar = {
         Row(
@@ -79,7 +84,7 @@ fun ScoresReceiverScreen(
         }
     }) {
         TabRow(selectedTabIndex = currentTab, tabs = {
-            (0..(scores.minOfOrNull { it.size } ?: 0)).forEach { index ->
+            (0 until (scores.maxOfOrNull { it.size } ?: 0)).forEach { index ->
                 Tab(selected = currentTab == index, onClick = {
                     currentTab = index
                 }, text = {

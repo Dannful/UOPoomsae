@@ -45,7 +45,7 @@ class ScoresReceiverViewModel @Inject constructor(
     val changes = mutableStateListOf<Pair<Int, Int>>()
 
     init {
-        resetScores(scores.value.minOf { it.size })
+        resetScores()
         fetchScores()
     }
 
@@ -79,6 +79,7 @@ class ScoresReceiverViewModel @Inject constructor(
                 displayRequestFailure(application)
                 return@launch
             }
+            resetScores()
             result.getOrThrow().forEach { scoreData ->
                 setScore(
                     scoreData.judgeId - 1,
@@ -101,6 +102,11 @@ class ScoresReceiverViewModel @Inject constructor(
         savedStateHandle[SCORES_KEY] = newScores
         for (i in score.keys)
             addRecentUpdate(i, judgeIndex)
+    }
+
+    private fun resetScores() {
+        savedStateHandle[SCORES_KEY] = List(JUDGE_COUNT) { mapOf(0 to ScoreBundle(0f, 0f)) }
+        changes.clear()
     }
 
     fun resetScores(index: Int) {
