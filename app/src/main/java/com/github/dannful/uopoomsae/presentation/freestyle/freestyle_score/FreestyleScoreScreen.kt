@@ -37,7 +37,6 @@ fun FreestyleScoreScreen(
     freestyleScoreViewModel: FreestyleScoreViewModel = hiltViewModel(),
     onSend: (FreestyleScores) -> Unit
 ) {
-    val spacing = LocalSpacing.current
     val scores by freestyleScoreViewModel.scores.collectAsState()
     PageHeader(bottomBar = {
         SendButton {
@@ -69,7 +68,7 @@ fun FreestyleScoreScreen(
                 "MÚSICA E COREOGRAFIA"
             ).forEachIndexed { index, name ->
                 NamedButtonGradient(name = name, isSelected = {
-                    scores.score[index] == FreestyleScoreViewModel.values[it]
+                    scores[index] == FreestyleScoreViewModel.values[it]
                 }) {
                     freestyleScoreViewModel.setScoreIndex(
                         index,
@@ -124,10 +123,10 @@ fun CheckGroup(
         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val scores by freestyleScoreViewModel.scores.collectAsState()
-        val firstStance = scores.firstStance
-        val secondStance = scores.secondStance
-        val thirdStance = scores.thirdStance
+        val stances by freestyleScoreViewModel.stances.collectAsState()
+        val firstStance = stances[0]
+        val secondStance = stances[1]
+        val thirdStance = stances[2]
         NamedCheckbox(
             text = "HAKDARI SEOGI",
             isChecked = firstStance

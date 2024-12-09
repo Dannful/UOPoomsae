@@ -7,6 +7,7 @@ import com.github.dannful.uopoomsae.domain.model.UserCredentials
 import com.github.dannful.uopoomsae.domain.repository.RemoteRepository
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.cookies.cookies
 import io.ktor.client.plugins.resources.get
 import io.ktor.client.plugins.resources.post
 import io.ktor.client.request.setBody

@@ -29,71 +29,62 @@ class FreestyleScoreViewModel @Inject constructor(
         )
 
         const val SCORES_KEY = "scores"
+        const val STANCES_KEY = "stances"
     }
 
     val scores = savedStateHandle.getStateFlow(
         SCORES_KEY,
-        FreestyleScore(
-            score = List(10) {
-                1f
-            },
-            firstStance = false,
-            secondStance = false,
-            thirdStance = false
-        )
+        List(10) {
+            1f
+        }.toFloatArray()
     )
 
-    fun setValue(score: FreestyleScore) {
-        savedStateHandle[SCORES_KEY] = score
-    }
+    val stances = savedStateHandle.getStateFlow(
+        STANCES_KEY,
+        booleanArrayOf(false, false, false)
+    )
 
     fun setScoreIndex(scoreIndex: Int, score: Float) {
-        val newScores = scores.value
-        val list = newScores.score.toMutableList()
-        list[scoreIndex] = score
-        savedStateHandle[SCORES_KEY] = newScores.copy(
-            score = list
-        )
+        val newScores = scores.value.clone()
+        newScores[scoreIndex] = score
+        savedStateHandle[SCORES_KEY] = newScores
     }
 
     fun setFirstStance(stance: Boolean) {
-        val newScores = scores.value
-        savedStateHandle[SCORES_KEY] = newScores.copy(
-            firstStance = stance
-        )
+        val newStances = stances.value.clone()
+        newStances[0] = stance
+        savedStateHandle[STANCES_KEY] = newStances
     }
 
     fun setSecondStance(stance: Boolean) {
-        val newScores = scores.value
-        savedStateHandle[SCORES_KEY] = newScores.copy(
-            secondStance = stance
-        )
+        val newStances = stances.value.clone()
+        newStances[1] = stance
+        savedStateHandle[STANCES_KEY] = newStances
     }
 
     fun setThirdStance(stance: Boolean) {
-        val newScores = scores.value
-        savedStateHandle[SCORES_KEY] = newScores.copy(
-            thirdStance = stance
-        )
+        val newStances = stances.value.clone()
+        newStances[2] = stance
+        savedStateHandle[STANCES_KEY] = newStances
     }
 
     fun calculateTechnique(): Float {
         // technique score is given by first give values
-        return scores.value.score.take(5).sum()
+        return scores.value.take(5).sum()
     }
 
     fun calculatePresentation(): Float {
-        return scores.value.score.sum() - calculateTechnique()
+        return scores.value.sum() - calculateTechnique()
     }
 
     fun calculateStanceDecrease(): Float {
-        val score = scores.value
+        val stance = stances.value
         var decrease = 0f
-        if (!score.firstStance)
+        if (!stance[0])
             decrease += 0.3f
-        if (!score.secondStance)
+        if (!stance[1])
             decrease += 0.3f
-        if (!score.thirdStance)
+        if (!stance[2])
             decrease += 0.3f
         return decrease
     }

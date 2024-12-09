@@ -69,14 +69,16 @@ class ModeSelectViewModel @Inject constructor(
         savedStateHandle[SUBMITTING_KEY] = true
         viewModelScope.launch {
             val isCompetitionMode = competitionMode.firstOrNull() ?: false
-            if (!isCompetitionMode) return@launch
+            if (!isCompetitionMode) {
+                savedStateHandle[SUBMITTING_KEY] = false
+                onFinished()
+                return@launch
+            }
             val convertedJudge = judge.value.toIntOrNull() ?: return@launch
             val convertedTable = table.value.toIntOrNull() ?: return@launch
             preferencesRepository.saveJudgeId(convertedJudge)
             preferencesRepository.saveTableId(convertedTable)
-            withContext(dispatcherProvider.Main) {
-                savedStateHandle[SUBMITTING_KEY] = false
-            }
+            savedStateHandle[SUBMITTING_KEY] = false
             onFinished()
         }
     }

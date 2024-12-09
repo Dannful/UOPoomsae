@@ -100,7 +100,7 @@ class ScoresReceiverViewModel @Inject constructor(
         newScores[judgeIndex] = score
         savedStateHandle[SCORES_KEY] = newScores
         for (i in score.keys)
-            addRecentUpdate(judgeIndex, i)
+            addRecentUpdate(i, judgeIndex)
     }
 
     fun resetScores(index: Int) {

@@ -102,7 +102,7 @@ fun ScoresReceiverScreen(
             }
             items(ScoresReceiverViewModel.JUDGE_COUNT, key = { it }) {
                 val judge = it + 1
-                val recentlyChanged = scoresReceiverViewModel.changes.contains(judge to currentTab)
+                val recentlyChanged = scoresReceiverViewModel.changes.contains(it to currentTab)
                 val scoreBundles = scores[it]
                 val score = scoreBundles.getOrElse(currentTab) { ScoreBundle(0f, 0f) }
                 Row {
