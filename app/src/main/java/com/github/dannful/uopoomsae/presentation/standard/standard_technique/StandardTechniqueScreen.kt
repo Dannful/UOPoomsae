@@ -1,14 +1,10 @@
 package com.github.dannful.uopoomsae.presentation.standard.standard_technique
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -21,18 +17,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
+
+private val largeButtonTextStyle: TextStyle
+    @Composable
+    get() = MaterialTheme.typography.displayMedium
+
+private val smallButtonTextStyle: TextStyle
+    @Composable
+    get() = MaterialTheme.typography.bodyLarge
 
 @Composable
 fun StandardTechniqueScreen(
@@ -59,10 +63,11 @@ fun StandardTechniqueScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ScoreButton(
-                    color = MaterialTheme.colorScheme.errorContainer,
+                    color = Constants.BLUE_COLOR,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.weight(1f),
-                    value = 0.3f
+                    value = 0.3f,
+                    style = smallButtonTextStyle
                 ) {
                     standardTechniqueViewModel.setScore(score + 0.3f)
                 }
@@ -72,10 +77,11 @@ fun StandardTechniqueScreen(
                     textAlign = TextAlign.Center
                 )
                 ScoreButton(
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = Constants.BLUE_COLOR,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.weight(1f),
-                    value = 0.1f
+                    value = 0.1f,
+                    style = smallButtonTextStyle
                 ) {
                     standardTechniqueViewModel.setScore(score + 0.1f)
                 }
@@ -88,12 +94,13 @@ fun StandardTechniqueScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 ScoreButton(
-                    color = MaterialTheme.colorScheme.errorContainer,
+                    color = Constants.BLUE_COLOR,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     value = -0.3f,
+                    style = largeButtonTextStyle
                 ) {
                     standardTechniqueViewModel.setScore(score - 0.3f)
                 }
@@ -104,12 +111,13 @@ fun StandardTechniqueScreen(
                     style = MaterialTheme.typography.displayLarge
                 )
                 ScoreButton(
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = Constants.BLUE_COLOR,
                     shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    value = -0.1f
+                    value = -0.1f,
+                    style = largeButtonTextStyle
                 ) {
                     standardTechniqueViewModel.setScore(score - 0.1f)
                 }
@@ -124,6 +132,7 @@ private fun ScoreButton(
     color: Color,
     shape: Shape = CircleShape,
     value: Float,
+    style: TextStyle,
     setScore: () -> Unit
 ) {
     Button(
@@ -133,7 +142,7 @@ private fun ScoreButton(
         onClick = setScore
     ) {
         val plusOrMinus = if (value > 0) "+" else ""
-        Text(text = "$plusOrMinus$value", color = MaterialTheme.colorScheme.onBackground)
+        Text(text = "$plusOrMinus$value", color = Color.Black, style = style)
     }
 }
 

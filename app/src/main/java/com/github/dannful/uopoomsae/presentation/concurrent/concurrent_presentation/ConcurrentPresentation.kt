@@ -1,7 +1,5 @@
 package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,10 +25,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
-import com.github.dannful.uopoomsae.presentation.concurrent.core.ConcurrentScore
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
-import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.StandardPresentationViewModel
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing

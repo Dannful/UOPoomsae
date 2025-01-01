@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -25,11 +28,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
+import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
+
+private val initialColor = Color(30, 182, 225)
 
 @Composable
 fun StandardPresentationScreen(
@@ -53,6 +59,19 @@ fun StandardPresentationScreen(
             verticalArrangement = Arrangement.spacedBy(spacing.small),
             modifier = Modifier.fillMaxSize()
         ) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = formatDecimal(scores.sum()), style = MaterialTheme.typography.displaySmall,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                Text(
+                    text = "NOTA DE APRESENTAÇÃO",
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
             val speed = scores[0]
             val pace = scores[1]
             val power = scores[2]
@@ -107,7 +126,7 @@ private fun ColumnScope.NamedGradient(
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         ButtonGradient(
-            initialColor = Constants.DEFAULT_FIRST_COLOR,
+            initialColor = initialColor,
             finalColor = Color.Black,
             values = values,
             isSelected = isSelected,
