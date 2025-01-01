@@ -3,6 +3,7 @@ package com.github.dannful.uopoomsae.presentation.freestyle.freestyle_score
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -26,6 +27,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
+import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.FreestyleScores
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
@@ -53,25 +55,57 @@ fun FreestyleScoreScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.medium)
         ) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = formatDecimal(scores.take(6).sum()),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(text = "NOTA DE PRECISÃO", style = MaterialTheme.typography.titleLarge)
+                Spacer(
+                    modifier = Modifier
+                )
+            }
             listOf(
                 "LATERAL SALTANDO",
                 "FRONTAL SEQUENCIAL SALTANDO",
                 "GRADIENTE SALTANDO",
-                "CONSECUTIVO DE KYORUGI",
-                "ACROBACIA",
-                "MOVIMENTOS PRÁTICOS",
-                "CRIATIVIDADE",
-                "HARMONIA",
-                "EXPRESSÃO DE ENERGIA",
-                "MÚSICA E COREOGRAFIA"
+                "CONSECUTIVOS DE LUTA",
+                "ACROBÁTICOS",
+                "MOVIMENTOS PRÁTICOS DE TAEKWONDO"
             ).forEachIndexed { index, name ->
                 NamedButtonGradient(name = name, isSelected = {
                     scores[index] == FreestyleScoreViewModel.values[it]
                 }) {
                     freestyleScoreViewModel.setScoreIndex(
                         index,
+                        FreestyleScoreViewModel.values[it]
+                    )
+                }
+            }
+            Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = formatDecimal(scores.takeLast(4).sum()),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(text = "NOTA DE APRESENTAÇÃO", style = MaterialTheme.typography.titleLarge)
+                Spacer(
+                    modifier = Modifier
+                )
+            }
+            listOf(
+                "CRIATIVIDADE",
+                "HARMONIA",
+                "EXPRESSÃO DE ENERGIA",
+                "MUSICALIDADE E COREOGRAFIA"
+            ).forEachIndexed { index, name ->
+                NamedButtonGradient(name = name, isSelected = {
+                    scores[index + 6] == FreestyleScoreViewModel.values[it]
+                }) {
+                    freestyleScoreViewModel.setScoreIndex(
+                        index + 6,
                         FreestyleScoreViewModel.values[it]
                     )
                 }
@@ -94,22 +128,13 @@ private fun NamedButtonGradient(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(text = name, style = MaterialTheme.typography.titleSmall)
-            ButtonGradient(
-                horizontalArrangement = Arrangement.End,
-                boxSize = 45.dp,
-                initialColor = Constants.DEFAULT_FIRST_COLOR,
-                finalColor = Color.Black,
-                values = FreestyleScoreViewModel.values.map { it.toString() },
-                isSelected = isSelected, onClick = onClick, groupSize = 2
-            )
-        }
-        HorizontalDivider()
+        Text(text = name, style = MaterialTheme.typography.titleMedium)
+        ButtonGradient(
+            initialColor = Constants.BLUE_COLOR,
+            finalColor = Color.Black,
+            values = FreestyleScoreViewModel.values.map { it.toString() },
+            isSelected = isSelected, onClick = onClick, groupSize = 2
+        )
     }
 }
 

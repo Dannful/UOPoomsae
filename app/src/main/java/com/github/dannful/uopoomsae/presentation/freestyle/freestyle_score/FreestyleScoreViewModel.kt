@@ -69,8 +69,8 @@ class FreestyleScoreViewModel @Inject constructor(
     }
 
     fun calculateTechnique(): Float {
-        // technique score is given by first give values
-        return scores.value.take(5).sum()
+        // technique score is given by the first 6 values
+        return scores.value.take(6).sum()
     }
 
     fun calculatePresentation(): Float {

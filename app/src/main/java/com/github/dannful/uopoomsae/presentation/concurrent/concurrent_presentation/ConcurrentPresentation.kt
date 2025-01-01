@@ -1,15 +1,16 @@
 package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -27,10 +28,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
-import com.github.dannful.uopoomsae.presentation.concurrent.core.ConcurrentScore
+import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
-import com.github.dannful.uopoomsae.presentation.core.ScoreBundle
 import com.github.dannful.uopoomsae.presentation.core.SendButton
 import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.StandardPresentationViewModel
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
@@ -55,66 +55,96 @@ fun ConcurrentPresentationScreen(
             )
         }
     }) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            VerticalDivider(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .fillMaxHeight()
-            )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacing.medium,
-                    alignment = Alignment.CenterHorizontally
-                ),
-                modifier = Modifier.align(Alignment.Center)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(scores.size, key = { it }) { index ->
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(spacing.small),
-                        modifier = Modifier.width(LocalConfiguration.current.screenWidthDp.dp / (scores.size * 1.1f))
-                    ) {
-                        val speed = scores[index][0]
-                        val pace = scores[index][1]
-                        val power = scores[index][2]
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "VELOCIDADE E POTÊNCIA",
-                            isSelected = {
-                                speed == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            concurrentPresentationViewModel.setValue(
-                                index,
-                                speed = StandardPresentationViewModel.values[it]
-                            )
-                        }
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "RITMO E TEMPO",
-                            isSelected = {
-                                pace == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            concurrentPresentationViewModel.setValue(
-                                index,
-                                pace = StandardPresentationViewModel.values[it]
-                            )
-                        }
-                        NamedGradient(
-                            values = StandardPresentationViewModel.values.map { it.toString() },
-                            name = "EXPRESSÃO DE ENERGIA",
-                            isSelected = {
-                                power == StandardPresentationViewModel.values[it]
-                            }
-                        ) {
-                            concurrentPresentationViewModel.setValue(
-                                index,
-                                power = StandardPresentationViewModel.values[it]
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = formatDecimal(scores[0].sum()),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = "NOTA DE APRESENTAÇÃO",
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    text = formatDecimal(scores[1].sum()),
+                    style = MaterialTheme.typography.titleLarge
+                )
             }
+            NamedGradient(
+                values = ConcurrentPresentationViewModel.values.map { it.toString() },
+                name = "VELOCIDADE E POTÊNCIA",
+                isFirstSelected = {
+                    scores[0][0] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectFirst = {
+                    concurrentPresentationViewModel.setValue(
+                        0,
+                        speed = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                isSecondSelected = {
+                    scores[1][0] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectSecond = {
+                    concurrentPresentationViewModel.setValue(
+                        1,
+                        speed = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                reversed = concurrentPresentationViewModel.reversed
+            )
+            NamedGradient(
+                values = ConcurrentPresentationViewModel.values.map { it.toString() },
+                name = "RITMO E TEMPO",
+                isFirstSelected = {
+                    scores[0][1] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectFirst = {
+                    concurrentPresentationViewModel.setValue(
+                        0,
+                        pace = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                isSecondSelected = {
+                    scores[1][1] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectSecond = {
+                    concurrentPresentationViewModel.setValue(
+                        1,
+                        pace = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                reversed = concurrentPresentationViewModel.reversed
+            )
+            NamedGradient(
+                values = ConcurrentPresentationViewModel.values.map { it.toString() },
+                name = "EXPRESSÃO DE ENERGIA",
+                isFirstSelected = {
+                    scores[0][2] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectFirst = {
+                    concurrentPresentationViewModel.setValue(
+                        0,
+                        power = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                isSecondSelected = {
+                    scores[1][2] == ConcurrentPresentationViewModel.values[it]
+                },
+                onSelectSecond = {
+                    concurrentPresentationViewModel.setValue(
+                        1,
+                        power = ConcurrentPresentationViewModel.values[it]
+                    )
+                },
+                reversed = concurrentPresentationViewModel.reversed
+            )
         }
     }
 }
@@ -123,23 +153,43 @@ fun ConcurrentPresentationScreen(
 private fun ColumnScope.NamedGradient(
     values: List<String>,
     name: String,
-    isSelected: (Int) -> Boolean,
-    onSelect: (Int) -> Unit
+    reversed: Boolean,
+    firstScore: Float? = null,
+    secondScore: Float? = null,
+    isFirstSelected: (Int) -> Boolean,
+    onSelectFirst: (Int) -> Unit,
+    isSecondSelected: (Int) -> Boolean,
+    onSelectSecond: (Int) -> Unit
 ) {
-    Column(modifier = Modifier.weight(1f)) {
+    Column(
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny)
+    ) {
         Text(
             text = name,
             textAlign = TextAlign.Center,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        ButtonGradient(
-            initialColor = Constants.DEFAULT_FIRST_COLOR,
-            finalColor = Color.Black,
-            values = values,
-            isSelected = isSelected,
-            onClick = onSelect,
-            groupSize = 3
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.large)) {
+            ButtonGradient(
+                initialColor = if (reversed) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
+                finalColor = Color.Black,
+                values = values,
+                isSelected = isFirstSelected,
+                onClick = onSelectFirst,
+                groupSize = 3,
+                modifier = Modifier.weight(1f)
+            )
+            ButtonGradient(
+                initialColor = if (reversed) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
+                finalColor = Color.Black,
+                values = values,
+                isSelected = isSecondSelected,
+                onClick = onSelectSecond,
+                groupSize = 3,
+                modifier = Modifier.weight(1f)
+            )
+        }
     }
 }
 

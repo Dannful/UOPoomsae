@@ -32,11 +32,6 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private enum class PageState {
-    SELECTING_COMPETITION_TYPE,
-    SELECTING_STANDARD_TYPE
-}
-
 @Composable
 fun CompetitionTypeScreen(
     competitionTypeViewModel: CompetitionTypeViewModel = hiltViewModel(),
@@ -45,9 +40,6 @@ fun CompetitionTypeScreen(
     freestyleMode: () -> Unit,
     onBack: (Route) -> Unit
 ) {
-    var pageState by rememberSaveable {
-        mutableStateOf(PageState.SELECTING_COMPETITION_TYPE)
-    }
     Box(
         modifier = Modifier
             .padding(LocalSpacing.current.huge)
@@ -74,26 +66,14 @@ fun CompetitionTypeScreen(
                 verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
                 modifier = Modifier.weight(1f)
             ) {
-                when (pageState) {
-                    PageState.SELECTING_COMPETITION_TYPE -> {
-                        Button(onClick = {
-                            pageState = PageState.SELECTING_STANDARD_TYPE
-                        }, modifier = Modifier.fillMaxWidth()) {
-                            Text(text = "Reconhecido")
-                        }
-                        Button(onClick = freestyleMode, modifier = Modifier.fillMaxWidth()) {
-                            Text(text = "Freestyle")
-                        }
-                    }
-
-                    PageState.SELECTING_STANDARD_TYPE -> {
-                        Button(onClick = standardMode, modifier = Modifier.fillMaxWidth()) {
-                            Text(text = "Individual")
-                        }
-                        Button(onClick = multipleMode, modifier = Modifier.fillMaxWidth()) {
-                            Text(text = "Simultâneo")
-                        }
-                    }
+                Button(onClick = standardMode, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Simples")
+                }
+                Button(onClick = multipleMode, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Simultâneo")
+                }
+                Button(onClick = freestyleMode, modifier = Modifier.fillMaxWidth()) {
+                    Text(text = "Freestyle")
                 }
             }
         }

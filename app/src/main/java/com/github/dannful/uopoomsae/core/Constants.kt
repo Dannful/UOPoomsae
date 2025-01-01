@@ -6,6 +6,8 @@ import androidx.compose.ui.unit.dp
 object Constants {
 
     val DEFAULT_FIRST_COLOR = Color(235, 127, 45, 255)
+    val BLUE_COLOR = Color(115, 144, 200)
+
 
     val GRID_CELL_SIZE = 117.dp
 
