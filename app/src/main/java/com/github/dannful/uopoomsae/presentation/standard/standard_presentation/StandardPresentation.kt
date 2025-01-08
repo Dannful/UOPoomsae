@@ -3,30 +3,22 @@ package com.github.dannful.uopoomsae.presentation.standard.standard_presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
@@ -57,7 +49,8 @@ fun StandardPresentationScreen(
     }) {
         Column(
             verticalArrangement = Arrangement.spacedBy(spacing.small),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
         ) {
             Box(
                 modifier = Modifier.fillMaxWidth()
@@ -113,13 +106,13 @@ fun StandardPresentationScreen(
 }
 
 @Composable
-private fun ColumnScope.NamedGradient(
+private fun NamedGradient(
     values: List<String>,
     name: String,
     isSelected: (Int) -> Boolean,
     onSelect: (Int) -> Unit
 ) {
-    Column(modifier = Modifier.weight(1f)) {
+    Column {
         Text(
             text = name,
             textAlign = TextAlign.Center,

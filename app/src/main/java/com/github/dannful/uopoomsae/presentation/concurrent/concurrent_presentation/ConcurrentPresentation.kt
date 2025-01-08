@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -56,7 +58,8 @@ fun ConcurrentPresentationScreen(
         }
     }) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.small)
+            verticalArrangement = Arrangement.spacedBy(spacing.small),
+            modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -154,15 +157,12 @@ private fun ColumnScope.NamedGradient(
     values: List<String>,
     name: String,
     reversed: Boolean,
-    firstScore: Float? = null,
-    secondScore: Float? = null,
     isFirstSelected: (Int) -> Boolean,
     onSelectFirst: (Int) -> Unit,
     isSecondSelected: (Int) -> Boolean,
     onSelectSecond: (Int) -> Unit
 ) {
     Column(
-        modifier = Modifier.weight(1f),
         verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.tiny)
     ) {
         Text(
@@ -178,7 +178,7 @@ private fun ColumnScope.NamedGradient(
                 isSelected = isFirstSelected,
                 onClick = onSelectFirst,
                 groupSize = 3,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
             ButtonGradient(
                 initialColor = if (reversed) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.primaryContainer,
@@ -187,7 +187,7 @@ private fun ColumnScope.NamedGradient(
                 isSelected = isSecondSelected,
                 onClick = onSelectSecond,
                 groupSize = 3,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         }
     }
