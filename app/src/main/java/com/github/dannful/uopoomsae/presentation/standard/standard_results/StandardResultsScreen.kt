@@ -2,11 +2,14 @@ package com.github.dannful.uopoomsae.presentation.standard.standard_results
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,42 +44,46 @@ fun StandardResultsScreen(
     }) {
         val techniqueScore = standardResultsViewModel.techniqueScore
         val presentationScore = standardResultsViewModel.presentationScore
-        Text(
-            text = "NOTA FINAL",
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(
-                    LocalSpacing.current.huge
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(
-                LocalSpacing.current.huge,
-                Alignment.CenterHorizontally
-            )
+        Column(
+            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
+            modifier = Modifier.verticalScroll(rememberScrollState())
         ) {
-            ScoreResult(
-                score = techniqueScore,
-                bodyColor = Constants.BLUE_COLOR,
-                titleText = "PRECISÃO",
-                modifier = Modifier.weight(1f)
+            Text(
+                text = "NOTA FINAL",
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
             )
-            ScoreResult(
-                score = presentationScore,
-                bodyColor = Constants.BLUE_COLOR,
-                titleText = "APRESENTAÇÃO",
-                modifier = Modifier.weight(1f)
-            )
-            ScoreBadge(
-                score = techniqueScore + presentationScore,
-                badgeColor = Constants.BLUE_COLOR,
-                modifier = Modifier.weight(0.5f)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        LocalSpacing.current.huge
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(
+                    LocalSpacing.current.huge,
+                    Alignment.CenterHorizontally
+                )
+            ) {
+                ScoreResult(
+                    score = techniqueScore,
+                    bodyColor = Constants.BLUE_COLOR,
+                    titleText = "PRECISÃO",
+                    modifier = Modifier.weight(1f)
+                )
+                ScoreResult(
+                    score = presentationScore,
+                    bodyColor = Constants.BLUE_COLOR,
+                    titleText = "APRESENTAÇÃO",
+                    modifier = Modifier.weight(1f)
+                )
+                ScoreBadge(
+                    score = techniqueScore + presentationScore,
+                    badgeColor = Constants.BLUE_COLOR,
+                    modifier = Modifier.weight(0.5f)
+                )
+            }
         }
     }
 }

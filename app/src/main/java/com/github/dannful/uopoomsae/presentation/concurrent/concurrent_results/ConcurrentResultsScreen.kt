@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -48,7 +50,9 @@ fun ConcurrentResultsScreen(
         Text(
             text = "NOTA FINAL",
             style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.weight(1f).fillMaxSize(),
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxSize(),
             textAlign = TextAlign.Center
         )
         Row(
@@ -88,12 +92,11 @@ private fun ResultGroup(
     Column(
         verticalArrangement = Arrangement.spacedBy(spacing.small),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        modifier = modifier.verticalScroll(rememberScrollState())
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(spacing.medium),
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(2f)
         ) {
             ScoreResult(
                 score = techniqueScore,
@@ -115,7 +118,8 @@ private fun ResultGroup(
         ScoreBadge(
             score = techniqueScore + presentationScore,
             badgeColor = color,
-            modifier = Modifier.weight(1f).width(128.dp),
+            modifier = Modifier
+                .width(128.dp),
             textColor = Color.White,
             textStyle = MaterialTheme.typography.displaySmall
         )

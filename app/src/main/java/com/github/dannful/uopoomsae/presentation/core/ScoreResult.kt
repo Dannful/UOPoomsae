@@ -6,8 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -30,10 +33,10 @@ fun ScoreResult(
     bodyColor: Color,
     titleText: String,
     textColor: Color = Color.Black,
-    textStyle: TextStyle = MaterialTheme.typography.displayLarge
+    textStyle: TextStyle = MaterialTheme.typography.displaySmall
 ) {
     val spacing = LocalSpacing.current
-    Column(modifier = modifier) {
+    Column(modifier = modifier.height(132.dp)) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -83,13 +86,14 @@ fun ScoreBadge(
     score: Float,
     badgeColor: Color,
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.displayLarge,
+    textStyle: TextStyle = MaterialTheme.typography.displaySmall,
     textColor: Color = Color.Black
 ) {
     val spacing = LocalSpacing.current
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
+            .requiredWidth(132.dp)
             .padding(
                 vertical = spacing.tiny,
                 horizontal = spacing.large
