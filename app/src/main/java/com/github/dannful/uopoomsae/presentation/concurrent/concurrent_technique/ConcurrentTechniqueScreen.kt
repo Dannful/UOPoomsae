@@ -59,7 +59,7 @@ fun ConcurrentTechniqueScreen(
         SendButton {
             onSend(if (reversed) scores.reversedArray() else scores, reversed)
         }
-    }) {
+    }, title = "NOTA DE PRECISÃO") {
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -68,11 +68,6 @@ fun ConcurrentTechniqueScreen(
                 modifier = Modifier.align(Alignment.TopCenter),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = "NOTA DE PRECISÃO",
-                    style = MaterialTheme.typography.titleLarge,
-                    textAlign = TextAlign.Center
-                )
                 Switch(checked = reversed, onCheckedChange = {
                     reversed = it
                 })

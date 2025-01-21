@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.github.dannful.uopoomsae.R
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
@@ -25,6 +26,7 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 @Composable
 fun PageHeader(
     modifier: Modifier = Modifier,
+    title: String = "",
     bottomBar: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit
 ) {
@@ -32,16 +34,21 @@ fun PageHeader(
         Surface(tonalElevation = 1.dp, shadowElevation = 1.dp) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier
+                    .fillMaxHeight(0.1f)
+                    .fillMaxWidth()
                     .padding(
                         LocalSpacing.current.small
-                    )
-                    .fillMaxHeight(0.1f)
-                    .fillMaxWidth(),
+                    ),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
                     style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
                 )
                 Image(
                     painter = painterResource(id = R.drawable.c_farpoomsae),

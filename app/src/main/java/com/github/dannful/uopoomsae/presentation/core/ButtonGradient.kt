@@ -28,7 +28,7 @@ import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 fun ButtonGradient(
     modifier: Modifier = Modifier,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.Center,
-    boxSize: Dp = 48.dp,
+    boxSize: Dp = 36.dp,
     initialColor: Color,
     finalColor: Color,
     groupSize: Int,
@@ -68,7 +68,7 @@ fun ButtonGradient(
                     .clickable {
                         onClick(index)
                     }
-                    .padding(LocalSpacing.current.small)
+                    .padding(LocalSpacing.current.tiny)
             ) {
                 Text(text = item, color = MaterialTheme.colorScheme.onBackground)
             }

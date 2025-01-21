@@ -41,19 +41,17 @@ fun StandardResultsScreen(
             onSelectMode = onSelectMode,
             onFinish = onFinish
         )
-    }) {
+    }, title = "NOTA FINAL") {
         val techniqueScore = standardResultsViewModel.techniqueScore
         val presentationScore = standardResultsViewModel.presentationScore
         Column(
-            verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small),
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            verticalArrangement = Arrangement.spacedBy(
+                LocalSpacing.current.small,
+                Alignment.CenterVertically
+            ),
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "NOTA FINAL",
-                style = MaterialTheme.typography.titleLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()

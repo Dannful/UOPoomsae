@@ -1,40 +1,30 @@
 package com.github.dannful.uopoomsae.presentation.concurrent.concurrent_presentation
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.github.dannful.uopoomsae.core.Constants
 import com.github.dannful.uopoomsae.core.Route
 import com.github.dannful.uopoomsae.core.formatDecimal
 import com.github.dannful.uopoomsae.presentation.core.ButtonGradient
 import com.github.dannful.uopoomsae.presentation.core.PageHeader
 import com.github.dannful.uopoomsae.presentation.core.SendButton
-import com.github.dannful.uopoomsae.presentation.standard.standard_presentation.StandardPresentationViewModel
 import com.github.dannful.uopoomsae.ui.theme.LocalSpacing
 
 @Composable
@@ -56,32 +46,16 @@ fun ConcurrentPresentationScreen(
                 }
             )
         }
-    }) {
+    }, title = "NOTA DE APRESENTAÇÃO") {
         Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.small),
-            modifier = Modifier.verticalScroll(rememberScrollState())
+            verticalArrangement = Arrangement.spacedBy(spacing.small, Alignment.CenterVertically),
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = formatDecimal(scores[0].sum()),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = "NOTA DE APRESENTAÇÃO",
-                    style = MaterialTheme.typography.titleLarge
-                )
-                Text(
-                    text = formatDecimal(scores[1].sum()),
-                    style = MaterialTheme.typography.titleLarge
-                )
-            }
             NamedGradient(
                 values = ConcurrentPresentationViewModel.values.map { it.toString() },
                 name = "VELOCIDADE E POTÊNCIA",
+                reversed = concurrentPresentationViewModel.reversed,
                 isFirstSelected = {
                     scores[0][0] == ConcurrentPresentationViewModel.values[it]
                 },
@@ -93,18 +67,17 @@ fun ConcurrentPresentationScreen(
                 },
                 isSecondSelected = {
                     scores[1][0] == ConcurrentPresentationViewModel.values[it]
-                },
-                onSelectSecond = {
-                    concurrentPresentationViewModel.setValue(
-                        1,
-                        speed = ConcurrentPresentationViewModel.values[it]
-                    )
-                },
-                reversed = concurrentPresentationViewModel.reversed
-            )
+                }
+            ) {
+                concurrentPresentationViewModel.setValue(
+                    1,
+                    speed = ConcurrentPresentationViewModel.values[it]
+                )
+            }
             NamedGradient(
                 values = ConcurrentPresentationViewModel.values.map { it.toString() },
                 name = "RITMO E TEMPO",
+                reversed = concurrentPresentationViewModel.reversed,
                 isFirstSelected = {
                     scores[0][1] == ConcurrentPresentationViewModel.values[it]
                 },
@@ -116,18 +89,17 @@ fun ConcurrentPresentationScreen(
                 },
                 isSecondSelected = {
                     scores[1][1] == ConcurrentPresentationViewModel.values[it]
-                },
-                onSelectSecond = {
-                    concurrentPresentationViewModel.setValue(
-                        1,
-                        pace = ConcurrentPresentationViewModel.values[it]
-                    )
-                },
-                reversed = concurrentPresentationViewModel.reversed
-            )
+                }
+            ) {
+                concurrentPresentationViewModel.setValue(
+                    1,
+                    pace = ConcurrentPresentationViewModel.values[it]
+                )
+            }
             NamedGradient(
                 values = ConcurrentPresentationViewModel.values.map { it.toString() },
                 name = "EXPRESSÃO DE ENERGIA",
+                reversed = concurrentPresentationViewModel.reversed,
                 isFirstSelected = {
                     scores[0][2] == ConcurrentPresentationViewModel.values[it]
                 },
@@ -139,21 +111,19 @@ fun ConcurrentPresentationScreen(
                 },
                 isSecondSelected = {
                     scores[1][2] == ConcurrentPresentationViewModel.values[it]
-                },
-                onSelectSecond = {
-                    concurrentPresentationViewModel.setValue(
-                        1,
-                        power = ConcurrentPresentationViewModel.values[it]
-                    )
-                },
-                reversed = concurrentPresentationViewModel.reversed
-            )
+                }
+            ) {
+                concurrentPresentationViewModel.setValue(
+                    1,
+                    power = ConcurrentPresentationViewModel.values[it]
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun ColumnScope.NamedGradient(
+private fun NamedGradient(
     values: List<String>,
     name: String,
     reversed: Boolean,

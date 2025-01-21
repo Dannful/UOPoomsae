@@ -44,20 +44,11 @@ fun ConcurrentResultsScreen(
             onSelectMode = onSelectMode,
             onFinish = onFinish
         )
-    }) {
+    }, title = "NOTA FINAL") {
         val techniqueScore = concurrentResultsViewModel.techniqueScore
         val presentationScore = concurrentResultsViewModel.presentationScore
-        Text(
-            text = "NOTA FINAL",
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxSize(),
-            textAlign = TextAlign.Center
-        )
         Row(
             modifier = Modifier
-                .weight(5f)
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(
@@ -92,7 +83,7 @@ private fun ResultGroup(
     Column(
         verticalArrangement = Arrangement.spacedBy(spacing.small),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.verticalScroll(rememberScrollState())
+        modifier = modifier
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(spacing.medium),

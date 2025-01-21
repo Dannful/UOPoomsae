@@ -3,6 +3,7 @@ package com.github.dannful.uopoomsae.presentation.standard.standard_technique
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
@@ -49,7 +50,7 @@ fun StandardTechniqueScreen(
         SendButton {
             onSend(score)
         }
-    }) {
+    }, title = "NOTA DE PRECISÃO") {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(spacing.small),
@@ -71,10 +72,8 @@ fun StandardTechniqueScreen(
                 ) {
                     standardTechniqueViewModel.setScore(score + 0.3f)
                 }
-                Text(
+                Spacer(
                     modifier = Modifier.weight(1f),
-                    text = "NOTA PRECISÃO",
-                    textAlign = TextAlign.Center
                 )
                 ScoreButton(
                     color = Constants.BLUE_COLOR,

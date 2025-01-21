@@ -3,6 +3,7 @@ package com.github.dannful.uopoomsae.presentation.standard.standard_presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -46,25 +47,12 @@ fun StandardPresentationScreen(
                 )
             )
         }
-    }) {
+    }, title = "NOTA DE APRESENTAÇÃO") {
         Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.small),
-            modifier = Modifier
-                .verticalScroll(rememberScrollState())
+            verticalArrangement = Arrangement.spacedBy(spacing.small, Alignment.CenterVertically),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
         ) {
-            Box(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = formatDecimal(scores.sum()), style = MaterialTheme.typography.displaySmall,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-                Text(
-                    text = "NOTA DE APRESENTAÇÃO",
-                    modifier = Modifier.align(Alignment.TopCenter),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
             val speed = scores[0]
             val pace = scores[1]
             val power = scores[2]
