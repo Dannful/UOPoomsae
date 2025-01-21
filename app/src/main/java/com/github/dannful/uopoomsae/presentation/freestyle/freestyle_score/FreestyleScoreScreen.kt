@@ -133,7 +133,8 @@ private fun NamedButtonGradient(
             initialColor = Constants.BLUE_COLOR,
             finalColor = Color.Black,
             values = FreestyleScoreViewModel.values.map { it.toString() },
-            isSelected = isSelected, onClick = onClick, groupSize = 2
+            isSelected = isSelected, onClick = onClick, groupSize = 2,
+            boxSize = 48.dp
         )
     }
 }

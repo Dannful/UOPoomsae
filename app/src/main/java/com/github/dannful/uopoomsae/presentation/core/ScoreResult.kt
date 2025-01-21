@@ -36,7 +36,7 @@ fun ScoreResult(
     textStyle: TextStyle = MaterialTheme.typography.displaySmall
 ) {
     val spacing = LocalSpacing.current
-    Column(modifier = modifier.height(132.dp)) {
+    Column(modifier = modifier.height(96.dp)) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -50,7 +50,7 @@ fun ScoreResult(
         ) {
             Text(
                 text = titleText,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 textAlign = TextAlign.Center,
                 color = Color.Black
             )
@@ -68,7 +68,7 @@ fun ScoreResult(
                         bottomEnd = spacing.large
                     )
                 )
-                .padding(spacing.large)
+                .padding(spacing.small)
         ) {
             Text(
                 text = formatDecimal(score),
